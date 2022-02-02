@@ -29,9 +29,9 @@ import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isNumeric}
 import com.amazon.deequ.analyzers.runners.MetricCalculationException
 
 import org.apache.spark.sql.DeequFunctions.stateful_kll
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{Column, Row}
-import org.apache.spark.sql.functions.col
+import com.snowflake.snowpark.types.StructType
+import com.snowflake.snowpark.{Column, Row}
+import com.snowflake.snowpark.functions.col
 
 /**
  * State definition for KLL Sketches.

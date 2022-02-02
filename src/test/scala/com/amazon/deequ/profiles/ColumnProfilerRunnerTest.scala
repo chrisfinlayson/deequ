@@ -33,9 +33,9 @@ class ColumnProfilerRunnerTest extends WordSpec with Matchers with SparkContextS
   "Column Profiler runner" should {
 
     "save and reuse existing results for column profile runs" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -66,9 +66,9 @@ class ColumnProfilerRunnerTest extends WordSpec with Matchers with SparkContextS
       }
 
     "save results if specified so they can be reused by other runners" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -86,9 +86,9 @@ class ColumnProfilerRunnerTest extends WordSpec with Matchers with SparkContextS
       }
 
     "only append results to repository without unnecessarily overwriting existing ones" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -114,9 +114,9 @@ class ColumnProfilerRunnerTest extends WordSpec with Matchers with SparkContextS
       }
 
     "if there are previous results in the repository new results should pre preferred in case of " +
-      "conflicts" in withSparkSession { sparkSession =>
+      "conflicts" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val repository = new InMemoryMetricsRepository
       val resultKey = ResultKey(0, Map.empty)
@@ -142,27 +142,27 @@ class ColumnProfilerRunnerTest extends WordSpec with Matchers with SparkContextS
           .subsetOf(repository.loadByKey(resultKey).get.metricMap.toSet))
     }
 
-    "should write output files to specified locations" in withSparkSession { sparkSession =>
+    "should write output files to specified locations" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val tempDir = TempFileUtils.tempDir("constraintSuggestionOuput")
       val columnProfilesPath = tempDir + "/column-profiles.json"
 
       ColumnProfilerRunner().onData(df)
-        .useSparkSession(sparkSession)
+        .useSession(Session)
         .saveColumnProfilesJsonToPath(columnProfilesPath)
         .run()
 
-      DfsUtils.readFromFileOnDfs(sparkSession, columnProfilesPath) {
+      DfsUtils.readFromFileOnDfs(Session, columnProfilesPath) {
         inputStream => assert(inputStream.read() > 0)
       }
     }
 
     "fail if specified when the calculation of new metrics would be needed when " +
-      "reusing previous results" in withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      "reusing previous results" in withMonitorableSession { (Session, sparkMonitor) =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       intercept[ReusingNotPossibleResultsMissingException](
         ColumnProfilerRunner()
@@ -173,8 +173,8 @@ class ColumnProfilerRunnerTest extends WordSpec with Matchers with SparkContextS
       )
     }
 
-    "should not run KLL Analyzer by default" in withSparkSession { sparkSession =>
-      val df = getDfWithNumericValues(sparkSession)
+    "should not run KLL Analyzer by default" in withSession { Session =>
+      val df = getDfWithNumericValues(Session)
 
       val results = ColumnProfilerRunner()
         .onData(df)
@@ -185,8 +185,8 @@ class ColumnProfilerRunnerTest extends WordSpec with Matchers with SparkContextS
       assert(results.profiles("att3").asInstanceOf[NumericColumnProfile].kll.isEmpty)
     }
 
-    "should run KLL Analyzer when enabled" in withSparkSession { sparkSession =>
-      val df = getDfWithNumericValues(sparkSession)
+    "should run KLL Analyzer when enabled" in withSession { Session =>
+      val df = getDfWithNumericValues(Session)
 
       val results = ColumnProfilerRunner()
         .onData(df)

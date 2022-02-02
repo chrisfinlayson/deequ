@@ -19,8 +19,8 @@ package com.amazon.deequ.profiles
 import com.amazon.deequ.analyzers.{DataTypeInstances, KLLParameters}
 import com.amazon.deequ.io.DfsUtils
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
-import org.apache.spark.annotation.Experimental
-import org.apache.spark.sql.{DataFrame, SparkSession}
+//import org.apache.spark.annotation.Experimental
+import com.snowflake.snowpark.{DataFrame, Session}
 
 private[profiles] case class ColumnProfilerRunBuilderMetricsRepositoryOptions(
       metricsRepository: Option[MetricsRepository],
@@ -29,11 +29,11 @@ private[profiles] case class ColumnProfilerRunBuilderMetricsRepositoryOptions(
       saveOrAppendResultsKey: Option[ResultKey])
 
 private[profiles] case class ColumnProfilerRunBuilderFileOutputOptions(
-      session: Option[SparkSession],
+      session: Option[Session],
       saveColumnProfilesJsonToPath: Option[String],
       overwriteResults: Boolean)
 
-@Experimental
+//@Experimental
 class ColumnProfilerRunner {
 
   def onData(data: DataFrame): ColumnProfilerRunBuilder = {

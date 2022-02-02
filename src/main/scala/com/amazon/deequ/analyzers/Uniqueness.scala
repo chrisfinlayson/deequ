@@ -18,8 +18,8 @@ package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.Analyzers.COUNT_COL
 import org.apache.spark.sql.Column
-import org.apache.spark.sql.functions.{col, lit, sum}
-import org.apache.spark.sql.types.DoubleType
+import com.snowflake.snowpark.functions.{col, lit, sum}
+import com.snowflake.snowpark.types.DoubleType
 
 /** Uniqueness is the fraction of unique values of a column(s), i.e.,
   * values that occur exactly once. */

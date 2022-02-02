@@ -18,7 +18,7 @@ package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.runners.{AnalysisRunner, AnalyzerContext}
 import com.amazon.deequ.metrics.Metric
-import org.apache.spark.sql.DataFrame
+import com.snowflake.snowpark.DataFrame
 import org.apache.spark.storage.StorageLevel
 
 /**

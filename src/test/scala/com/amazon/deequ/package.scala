@@ -16,20 +16,20 @@
 
 package com.amazon
 
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.sql.types.{StructField, StructType}
-import org.apache.spark.sql.types.{ DataType => SparkDT }
+import com.snowflake.snowpark.{DataFrame,Row,Session}
+import com.snowflake.snowpark.types.{StructField, StructType}
+import com.snowflake.snowpark.types.{ DataType => SparkDT }
 
 package object deequ {
   def dataFrameWithColumn(
       name: String,
       columnType: SparkDT,
-      sparkSession: SparkSession,
+      Session: Session,
       values: Row*)
     : DataFrame = {
 
     import scala.collection.JavaConverters._
     val struct = StructType(StructField(name, columnType) :: Nil)
-    sparkSession.createDataFrame(values.asJava, struct).toDF(name)
+    Session.createDataFrame(values.asJava, struct).toDF(name)
   }
 }

@@ -18,9 +18,9 @@ package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.Analyzers._
 import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isString}
-import org.apache.spark.sql.{Column, Row}
-import org.apache.spark.sql.functions.{col, lit, regexp_extract, sum, when}
-import org.apache.spark.sql.types.{IntegerType, StructType}
+import com.snowflake.snowpark.{Column, Row}
+import com.snowflake.snowpark.functions.{col, lit, regexp_extract, sum, when}
+import com.snowflake.snowpark.types.{IntegerType, StructType}
 
 import scala.util.matching.Regex
 

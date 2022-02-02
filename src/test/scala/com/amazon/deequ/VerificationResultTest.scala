@@ -21,7 +21,7 @@ import com.amazon.deequ.checks.{Check, CheckLevel}
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository.SimpleResultSerde
 import com.amazon.deequ.utils.FixtureSupport
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import org.scalatest.{Matchers, WordSpec}
 
 class VerificationResultTest extends WordSpec with Matchers with SparkContextSpec
@@ -29,7 +29,7 @@ class VerificationResultTest extends WordSpec with Matchers with SparkContextSpe
 
   "VerificationResult getSuccessMetrics" should {
 
-    "correctly return a DataFrame that is formatted as expected" in withSparkSession { session =>
+    "correctly return a DataFrame that is formatted as expected" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -51,7 +51,7 @@ class VerificationResultTest extends WordSpec with Matchers with SparkContextSpe
     }
 
     "only include specific metrics in returned DataFrame if requested" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -72,7 +72,7 @@ class VerificationResultTest extends WordSpec with Matchers with SparkContextSpe
     }
 
     "correctly return Json that is formatted as expected" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -92,7 +92,7 @@ class VerificationResultTest extends WordSpec with Matchers with SparkContextSpe
       }
 
     "only include requested metrics in returned Json" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -114,7 +114,7 @@ class VerificationResultTest extends WordSpec with Matchers with SparkContextSpe
 
    "VerificationResult getCheckResults" should {
 
-    "correctly return a DataFrame that is formatted as expected" in withSparkSession { session =>
+    "correctly return a DataFrame that is formatted as expected" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -142,7 +142,7 @@ class VerificationResultTest extends WordSpec with Matchers with SparkContextSpe
     }
 
     "correctly return Json that is formatted as expected" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -174,7 +174,7 @@ class VerificationResultTest extends WordSpec with Matchers with SparkContextSpe
       }
   }
 
-  private[this] def evaluate(session: SparkSession)(test: VerificationResult => Unit): Unit = {
+  private[this] def evaluate(session: Session)(test: VerificationResult => Unit): Unit = {
 
     val data = getDfFull(session)
 

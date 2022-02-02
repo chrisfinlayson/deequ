@@ -19,7 +19,7 @@ package com.amazon.deequ.analyzers
 import com.amazon.deequ.SparkContextSpec
 import com.amazon.deequ.analyzers.runners.AnalysisRunner
 import com.amazon.deequ.utils.{FixtureSupport, TempFileUtils}
-import org.apache.spark.sql.{AnalysisException, DataFrame, SparkSession}
+import org.apache.spark.sql.{AnalysisException, DataFrame, Session}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -31,7 +31,7 @@ class StateProviderTest extends AnyWordSpec
 
   "Analyzers" should {
 
-    "correctly restore their state from memory" in withSparkSession { session =>
+    "correctly restore their state from memory" in withSession { session =>
 
       val provider = InMemoryStateProvider()
 
@@ -68,7 +68,7 @@ class StateProviderTest extends AnyWordSpec
       assertCorrectlyApproxQuantileState(provider, provider, ApproxQuantile("price", 0.5), data)
     }
 
-    "correctly restore their state from the filesystem" in withSparkSession { session =>
+    "correctly restore their state from the filesystem" in withSession { session =>
 
       val tempDir = TempFileUtils.tempDir("stateRestoration")
 
@@ -109,7 +109,7 @@ class StateProviderTest extends AnyWordSpec
     }
 
     "store frequency based state to same HDFS StateProvider for same analyzer more than once " +
-      "should fail if allowOverwrite is not set to true" in withSparkSession { session =>
+      "should fail if allowOverwrite is not set to true" in withSession { session =>
 
       val tempDir = TempFileUtils.tempDir("statePersist")
 
@@ -136,7 +136,7 @@ class StateProviderTest extends AnyWordSpec
     }
 
     "store frequency based state to same HDFS StateProvider for same analyzer more than once " +
-      "should overwrite state if allowOverwrite is set to true" in withSparkSession { session =>
+      "should overwrite state if allowOverwrite is set to true" in withSession { session =>
 
       val tempDir = TempFileUtils.tempDir("statePersist")
 
@@ -152,7 +152,7 @@ class StateProviderTest extends AnyWordSpec
         filteredData)
     }
 
-    "should store Histogram result to InMemoryStateProvider" in withSparkSession { session =>
+    "should store Histogram result to InMemoryStateProvider" in withSession { session =>
 
       val provider = InMemoryStateProvider()
 
@@ -246,7 +246,7 @@ class StateProviderTest extends AnyWordSpec
     assert(state.frequencies.collect().toSet == clonedState.get.frequencies.collect().toSet)
   }
 
-  def someData(session: SparkSession): DataFrame = {
+  def someData(session: Session): DataFrame = {
     import session.implicits._
 
     Seq(

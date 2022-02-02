@@ -24,7 +24,7 @@ import com.amazon.deequ.repository.ResultKey
 import com.amazon.deequ.repository.memory.InMemoryMetricsRepository
 import com.amazon.deequ.utils.{FixtureSupport, TempFileUtils}
 import org.scalatest.PrivateMethodTester
-import org.apache.spark.sql.functions.udf
+import com.snowflake.snowpark.functions.udf
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -39,7 +39,7 @@ class AnalysisRunnerTests extends AnyWordSpec
 
   "AnalysisRunner" should {
 
-    "correctly handle Histograms with binning functions" in withSparkSession { session =>
+    "correctly handle Histograms with binning functions" in withSession { session =>
 
       val data = getDfWithNumericValues(session)
 
@@ -59,9 +59,9 @@ class AnalysisRunnerTests extends AnyWordSpec
     }
 
     "join jobs into one for combinable analyzers" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val analyzers =
           Completeness("att1") :: Compliance("rule1", "att1 > 3") ::
@@ -85,9 +85,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "join column grouping analyzers, do grouping once and combine analysis" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-          val df = getDfWithNumericValues(sparkSession)
+          val df = getDfWithNumericValues(Session)
 
           val analyzers = Entropy("att1") :: Uniqueness("att1") :: Nil
 
@@ -107,9 +107,9 @@ class AnalysisRunnerTests extends AnyWordSpec
        }
 
     "join column grouping analyzers also for multi column analyzers" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val analyzers = Distinctness(Seq("att1", "att2")) :: Uniqueness(Seq("att1", "att2")) :: Nil
 
@@ -129,9 +129,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "join column grouping analyzers for column analyzers with the same filter condition" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val analyzers = Uniqueness("att1", Some("att3 > 0")) ::
           UniqueValueRatio(Seq("att1"), Some("att3 > 0")) :: Nil
@@ -152,9 +152,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "join column grouping analyzers for multi column analyzers with the same filter condition" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val analyzers = Uniqueness(Seq("att1", "att2"), Some("att3 > 0")) ::
           UniqueValueRatio(Seq("att1", "att2"), Some("att3 > 0")) :: Nil
@@ -175,9 +175,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "does not join column grouping analyzers for column analyzers with different " +
-      "filter condition" in withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      "filter condition" in withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val analyzers = Uniqueness("att1", Some("att3 > 0")) ::
           Uniqueness("att1", Some("att3 = 0")) ::
@@ -199,9 +199,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "reuse existing results" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val analyzerToTestReusingResults = Distinctness(Seq("att1", "att2"))
 
@@ -234,9 +234,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "fail if specified when the calculation of new metrics would be needed when " +
-      "reusing previous results" in withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      "reusing previous results" in withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val analyzerToTestReusingResults = Distinctness(Seq("att1", "att2"))
 
@@ -276,9 +276,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "save results if specified" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -292,9 +292,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "only append results to repository without unnecessarily overwriting existing ones" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -316,9 +316,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       }
 
     "if there are previous results in the repository new results should pre preferred in case of " +
-      "conflicts" in withSparkSession { sparkSession =>
+      "conflicts" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val repository = new InMemoryMetricsRepository
       val resultKey = ResultKey(0, Map.empty)
@@ -339,9 +339,9 @@ class AnalysisRunnerTests extends AnyWordSpec
       assert(expectedAnalyzerContextOnLoadByKey == repository.loadByKey(resultKey).get)
     }
 
-    "should write output files to specified locations" in withSparkSession { sparkSession =>
+    "should write output files to specified locations" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val analyzers = Size() :: Completeness("item") :: Nil
 
@@ -350,38 +350,38 @@ class AnalysisRunnerTests extends AnyWordSpec
 
       AnalysisRunner.onData(df)
         .addAnalyzers(analyzers)
-        .useSparkSession(sparkSession)
+        .useSession(Session)
         .saveSuccessMetricsJsonToPath(successMetricsPath)
         .run()
 
-      DfsUtils.readFromFileOnDfs(sparkSession, successMetricsPath) {
+      DfsUtils.readFromFileOnDfs(Session, successMetricsPath) {
         inputStream => assert(inputStream.read() > 0)
       }
     }
 
-    "should give error for duplicate analyzers" in withSparkSession { sparkSession =>
+    "should give error for duplicate analyzers" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val analyzers = Size() :: Completeness("item") :: Size() :: Nil
 
       intercept[IllegalArgumentException] {
         AnalysisRunner.onData(df)
           .addAnalyzers(analyzers)
-          .useSparkSession(sparkSession)
+          .useSession(Session)
           .run()
       }
     }
 
-    "should not give error for different analyzers with filtering options" in withSparkSession {
-      sparkSession =>
-      val df = getDfWithNumericValues(sparkSession)
+    "should not give error for different analyzers with filtering options" in withSession {
+      Session =>
+      val df = getDfWithNumericValues(Session)
       val analyzers = Size() :: Size(Some("att1 = 0")) :: Size(Some("att2 > 0")) :: Nil
 
       noException shouldBe thrownBy {
         AnalysisRunner.onData(df)
           .addAnalyzers(analyzers)
-          .useSparkSession(sparkSession)
+          .useSession(Session)
           .run()
       }
     }

@@ -18,7 +18,7 @@ package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.SparkContextSpec
 import com.amazon.deequ.utils.FixtureSupport
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -29,7 +29,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
   with FixtureSupport {
 
   "Size analyzer" should {
-    "compute correct metrics" in withSparkSession { session =>
+    "compute correct metrics" in withSession { session =>
 
       val analyzer = Size()
 
@@ -53,7 +53,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
   }
 
   "ComplianceAnalyzer" should {
-    "compute correct metrics" in withSparkSession { session =>
+    "compute correct metrics" in withSession { session =>
 
       val analyzer = Compliance("att1", "att1 = 'b'")
 
@@ -77,7 +77,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
   }
 
   "CompletenessAnalyzer" should {
-    "compute correct metrics" in withSparkSession { session =>
+    "compute correct metrics" in withSession { session =>
 
       val analyzer = Completeness("att1")
 
@@ -101,7 +101,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
   }
 
   "UniquenessAnalyzer" should {
-    "compute correct metrics for a single column" in withSparkSession { session =>
+    "compute correct metrics for a single column" in withSession { session =>
 
       val analyzer = Uniqueness("att1")
 
@@ -123,7 +123,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
       assert(uniqueness.value == Success(1.0 / 3))
     }
 
-    "compute correct metrics for column combinations" in withSparkSession { session =>
+    "compute correct metrics for column combinations" in withSession { session =>
 
       val analyzer = Uniqueness(Seq("att1", "count"))
 
@@ -147,7 +147,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
   }
 
   "EntropyAnalyzer" should {
-    "compute correct metrics" in withSparkSession { session =>
+    "compute correct metrics" in withSession { session =>
 
       val analyzer = Entropy("att1")
 
@@ -174,7 +174,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
   }
 
   "ApproxQuantile Analyzer" should {
-    "compute correct metrics for the whole and partial data-sets" in withSparkSession { session =>
+    "compute correct metrics for the whole and partial data-sets" in withSession { session =>
       import session.implicits._
 
       val attribute = "att1"
@@ -200,7 +200,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
   }
 
   "EntropyAnalyzer" should {
-    "compute correct metrics for three snapshots" in withSparkSession { session =>
+    "compute correct metrics for three snapshots" in withSession { session =>
 
       val analyzer = Entropy("att1")
 
@@ -240,7 +240,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
     }
   }
 
-  def initialData(session: SparkSession): DataFrame = {
+  def initialData(session: Session): DataFrame = {
     import session.implicits._
 
     Seq(
@@ -250,7 +250,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
       .toDF("item", "att1", "count")
   }
 
-  def deltaData(session: SparkSession): DataFrame = {
+  def deltaData(session: Session): DataFrame = {
     import session.implicits._
 
     Seq(
@@ -259,7 +259,7 @@ class IncrementalAnalyzerTest extends AnyWordSpec with Matchers with SparkContex
       .toDF("item", "att1", "count")
   }
 
-  def moreDeltaData(session: SparkSession): DataFrame = {
+  def moreDeltaData(session: Session): DataFrame = {
     import session.implicits._
 
     Seq(

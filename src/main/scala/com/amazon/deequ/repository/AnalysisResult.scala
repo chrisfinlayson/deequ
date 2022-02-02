@@ -20,7 +20,7 @@ import com.amazon.deequ.analyzers.Analyzer
 import com.amazon.deequ.metrics.Metric
 import org.apache.spark.sql._
 import com.amazon.deequ.analyzers.runners.AnalyzerContext
-import org.apache.spark.sql.functions.lit
+import com.snowflake.snowpark.functions.lit
 
 case class AnalysisResult(
     resultKey: ResultKey,
@@ -39,14 +39,14 @@ private[repository] object AnalysisResult {
     * @param withTags            Only include these Tags in the DataFrame
     */
   def getSuccessMetricsAsDataFrame(
-      sparkSession: SparkSession,
+      Session: Session,
       analysisResult: AnalysisResult,
       forAnalyzers: Seq[Analyzer[_, Metric[_]]] = Seq.empty,
       withTags: Seq[String] = Seq.empty)
     : DataFrame = {
 
     var analyzerContextDF = AnalyzerContext
-      .successMetricsAsDataFrame(sparkSession, analysisResult.analyzerContext, forAnalyzers)
+      .successMetricsAsDataFrame(Session, analysisResult.analyzerContext, forAnalyzers)
       .withColumn(DATASET_DATE_FIELD, lit(analysisResult.resultKey.dataSetDate))
 
     analysisResult.resultKey.tags

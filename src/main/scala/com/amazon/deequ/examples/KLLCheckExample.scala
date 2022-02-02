@@ -21,7 +21,7 @@ import com.amazon.deequ.VerificationSuite
 import com.amazon.deequ.analyzers.KLLParameters
 import com.amazon.deequ.checks.{Check, CheckLevel, CheckStatus}
 import com.amazon.deequ.constraints.ConstraintStatus
-import org.apache.spark.sql.types.DoubleType
+import com.snowflake.snowpark.types.DoubleType
 
 private[examples] object KLLCheckExample extends App {
 

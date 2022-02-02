@@ -16,9 +16,9 @@
 
 package com.amazon.deequ.analyzers
 
-import org.apache.spark.sql.types.IntegerType
-import org.apache.spark.sql.{Column, Row}
-import org.apache.spark.sql.functions._
+import com.snowflake.snowpark.types.IntegerType
+import com.snowflake.snowpark.{Column, Row}
+import com.snowflake.snowpark.functions._
 import Analyzers._
 
 /**

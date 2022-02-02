@@ -18,7 +18,8 @@ package com.amazon.deequ.profiles
 
 import com.amazon.deequ.repository._
 import com.amazon.deequ.analyzers.{DataTypeInstances, KLLParameters}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Session,DataFrame}
+//import com.snowflake.snowpark.{Dataframe, Session}
 
 /** A class to build a Constraint Suggestion run using a fluent API */
 class ColumnProfilerRunBuilder(val data: DataFrame) {
@@ -34,7 +35,7 @@ class ColumnProfilerRunBuilder(val data: DataFrame) {
   protected var failIfResultsForReusingMissing: Boolean = false
   protected var saveOrAppendResultsKey: Option[ResultKey] = None
 
-  protected var sparkSession: Option[SparkSession] = None
+  protected var Session: Option[Session] = None
   protected var overwriteOutputFiles: Boolean = false
   protected var saveColumnProfilesJsonPath: Option[String] = None
   protected var saveConstraintSuggestionsJsonPath: Option[String] = None
@@ -58,7 +59,7 @@ class ColumnProfilerRunBuilder(val data: DataFrame) {
     failIfResultsForReusingMissing = constraintSuggestionRunBuilder.failIfResultsForReusingMissing
     saveOrAppendResultsKey = constraintSuggestionRunBuilder.saveOrAppendResultsKey
 
-    sparkSession = constraintSuggestionRunBuilder.sparkSession
+    Session = constraintSuggestionRunBuilder.Session
     overwriteOutputFiles = constraintSuggestionRunBuilder.overwriteOutputFiles
     saveColumnProfilesJsonPath = constraintSuggestionRunBuilder.saveColumnProfilesJsonPath
     saveConstraintSuggestionsJsonPath = constraintSuggestionRunBuilder
@@ -153,15 +154,15 @@ class ColumnProfilerRunBuilder(val data: DataFrame) {
   }
 
   /**
-    * Use a sparkSession to conveniently create output files
+    * Use a Session to conveniently create output files
     *
-    * @param sparkSession The SparkSession
+    * @param Session The Session
     */
-  def useSparkSession(
-      sparkSession: SparkSession)
-    : ColumnProfilerRunBuilderWithSparkSession = {
+  def useSession(
+      Session: Session)
+    : ColumnProfilerRunBuilderWithSession = {
 
-    new ColumnProfilerRunBuilderWithSparkSession(this, Option(sparkSession))
+    new ColumnProfilerRunBuilderWithSession(this, Option(Session))
   }
 
   def run(): ColumnProfiles = {
@@ -172,7 +173,7 @@ class ColumnProfilerRunBuilder(val data: DataFrame) {
       printStatusUpdates,
       cacheInputs,
       ColumnProfilerRunBuilderFileOutputOptions(
-        sparkSession,
+        Session,
         saveColumnProfilesJsonPath,
         overwriteOutputFiles),
       ColumnProfilerRunBuilderMetricsRepositoryOptions(
@@ -222,12 +223,12 @@ class ColumnProfilerRunBuilderWithRepository(
   }
 }
 
-class ColumnProfilerRunBuilderWithSparkSession(
+class ColumnProfilerRunBuilderWithSession(
     columnProfilerRunBuilder: ColumnProfilerRunBuilder,
-    usingSparkSession: Option[SparkSession])
+    usingSession: Option[Session])
   extends ColumnProfilerRunBuilder(columnProfilerRunBuilder) {
 
-  sparkSession = usingSparkSession
+  Session = usingSession
 
   /**
     * Save the column profiles json to e.g. S3

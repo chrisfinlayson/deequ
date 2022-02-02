@@ -28,8 +28,8 @@ import com.amazon.deequ.{AnomalyCheckConfig, SparkContextSpec, VerificationResul
 import com.amazon.deequ.utils.{FixtureSupport, TempFileUtils}
 import java.time.{LocalDate, ZoneOffset}
 
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import com.snowflake.snowpark.{DataFrame,Row,Session}
+import com.snowflake.snowpark.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -40,7 +40,7 @@ class MetricsRepositoryAnomalyDetectionIntegrationTest extends AnyWordSpec with 
 
   "Anomaly Detection" should {
 
-    "work using the InMemoryMetricsRepository" in withSparkSession { session =>
+    "work using the InMemoryMetricsRepository" in withSession { session =>
 
       val repository = new InMemoryMetricsRepository()
 
@@ -48,7 +48,7 @@ class MetricsRepositoryAnomalyDetectionIntegrationTest extends AnyWordSpec with 
 
     }
 
-    "work using the FileSystemMetricsRepository" in withSparkSession { session =>
+    "work using the FileSystemMetricsRepository" in withSession { session =>
 
       val tempDir = TempFileUtils.tempDir("fileSystemRepositoryTest")
       val repository = new FileSystemMetricsRepository(session, tempDir + "repository-test.json")
@@ -58,7 +58,7 @@ class MetricsRepositoryAnomalyDetectionIntegrationTest extends AnyWordSpec with 
   }
 
   private[this] def testAnomalyDetection(
-    session: SparkSession,
+    session: Session,
     repository: MetricsRepository)
   : Unit = {
 
@@ -79,7 +79,7 @@ class MetricsRepositoryAnomalyDetectionIntegrationTest extends AnyWordSpec with 
     assertAnomalyCheckResultsAreCorrect(verificationResult)
   }
 
-  def getTestData(session: SparkSession): DataFrame = {
+  def getTestData(session: Session): DataFrame = {
 
     val schema = StructType(
       StructField("item", StringType, nullable = false) ::

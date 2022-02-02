@@ -21,7 +21,7 @@ import com.amazon.deequ.analyzers.runners.AnalyzerContext
 import com.amazon.deequ.checks.{Check, CheckResult, CheckStatus}
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository.SimpleResultSerde
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 
 /**
   * The result returned from the VerificationSuite
@@ -38,14 +38,14 @@ case class VerificationResult(
 object VerificationResult {
 
   def successMetricsAsDataFrame(
-      sparkSession: SparkSession,
+      Session: Session,
       verificationResult: VerificationResult,
       forAnalyzers: Seq[Analyzer[_, Metric[_]]] = Seq.empty)
     : DataFrame = {
 
     val metricsAsAnalyzerContext = AnalyzerContext(verificationResult.metrics)
 
-    AnalyzerContext.successMetricsAsDataFrame(sparkSession, metricsAsAnalyzerContext, forAnalyzers)
+    AnalyzerContext.successMetricsAsDataFrame(Session, metricsAsAnalyzerContext, forAnalyzers)
   }
 
   def successMetricsAsJson(verificationResult: VerificationResult,
@@ -57,14 +57,14 @@ object VerificationResult {
   }
 
   def checkResultsAsDataFrame(
-      sparkSession: SparkSession,
+      Session: Session,
       verificationResult: VerificationResult,
       forChecks: Seq[Check] = Seq.empty)
     : DataFrame = {
 
     val simplifiedCheckResults = getSimplifiedCheckResultOutput(verificationResult)
 
-    import sparkSession.implicits._
+    import Session.implicits._
 
     simplifiedCheckResults.toDF("check", "check_level", "check_status", "constraint",
       "constraint_status", "constraint_message")

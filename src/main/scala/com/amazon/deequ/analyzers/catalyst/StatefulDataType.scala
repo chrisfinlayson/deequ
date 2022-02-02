@@ -18,7 +18,7 @@ package org.apache.spark.sql
 
 import com.amazon.deequ.analyzers.DataTypeHistogram
 import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
-import org.apache.spark.sql.types._
+import com.snowflake.snowpark.types._
 
 import scala.util.matching.Regex
 

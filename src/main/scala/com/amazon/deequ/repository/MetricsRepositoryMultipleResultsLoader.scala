@@ -18,9 +18,9 @@ package com.amazon.deequ.repository
 
 import com.amazon.deequ.analyzers.Analyzer
 import com.amazon.deequ.metrics.Metric
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import com.amazon.deequ.analyzers.runners.AnalyzerContext
-import org.apache.spark.sql.functions._
+import com.snowflake.snowpark.functions._
 import org.apache.spark.sql.Column
 
 trait MetricsRepositoryMultipleResultsLoader {
@@ -61,18 +61,18 @@ trait MetricsRepositoryMultipleResultsLoader {
   /**
     * Get the AnalysisResult as DataFrame
     */
-  def getSuccessMetricsAsDataFrame(sparkSession: SparkSession, withTags: Seq[String] = Seq.empty)
+  def getSuccessMetricsAsDataFrame(Session: Session, withTags: Seq[String] = Seq.empty)
   : DataFrame = {
     val analysisResults = get()
 
     if (analysisResults.isEmpty) {
       // Return an empty DataFrame that still contains the usual columns
-      AnalysisResult.getSuccessMetricsAsDataFrame(sparkSession,
+      AnalysisResult.getSuccessMetricsAsDataFrame(Session,
         AnalysisResult(ResultKey(0, Map.empty), AnalyzerContext(Map.empty)))
     } else {
       analysisResults
         .map { result =>
-          AnalysisResult.getSuccessMetricsAsDataFrame(sparkSession, result, withTags = withTags)
+          AnalysisResult.getSuccessMetricsAsDataFrame(Session, result, withTags = withTags)
         }
         .reduce(MetricsRepositoryMultipleResultsLoader.dataFrameUnion)
     }

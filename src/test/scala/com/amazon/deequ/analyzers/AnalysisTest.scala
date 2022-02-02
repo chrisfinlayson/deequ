@@ -30,9 +30,9 @@ import scala.util.{Failure, Success}
 class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with FixtureSupport {
 
   "Analysis" should {
-    "return results for configured analyzers" in withSparkSession { sparkSession =>
+    "return results for configured analyzers" in withSession { Session =>
 
-      val df = getDfFull(sparkSession)
+      val df = getDfFull(Session)
 
       val analysisResult = AnalysisRunner.onData(df)
         .addAnalyzer(Size())
@@ -42,9 +42,9 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
         .run()
 
       val successMetricsAsDataFrame = AnalyzerContext
-        .successMetricsAsDataFrame(sparkSession, analysisResult)
+        .successMetricsAsDataFrame(Session, analysisResult)
 
-      import sparkSession.implicits._
+      import Session.implicits._
       val expected = Seq(
         ("Dataset", "*", "Size", 4.0),
         ("Column", "item", "Distinctness", 1.0),
@@ -56,11 +56,11 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
     }
 
     "return results for configured analyzers in case insensitive manner" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        sparkSession.sqlContext.setConf("spark.sql.caseSensitive", "false")
+        Session.sqlContext.setConf("spark.sql.caseSensitive", "false")
 
-        val df = getDfFull(sparkSession)
+        val df = getDfFull(Session)
 
         val analysisResult = AnalysisRunner.onData(df)
           .addAnalyzer(Size())
@@ -70,9 +70,9 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
           .run()
 
         val successMetricsAsDataFrame = AnalyzerContext
-          .successMetricsAsDataFrame(sparkSession, analysisResult)
+          .successMetricsAsDataFrame(Session, analysisResult)
 
-        import sparkSession.implicits._
+        import Session.implicits._
         val expected = Seq(
           ("Dataset", "*", "Size", 4.0),
           ("Column", "ITEM", "Distinctness", 1.0),
@@ -82,8 +82,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
         assertSameRows(successMetricsAsDataFrame, expected)
       }
 
-    "return basic statistics" in withSparkSession { sparkSession =>
-      val df = getDfWithNumericValues(sparkSession)
+    "return basic statistics" in withSession { Session =>
+      val df = getDfWithNumericValues(Session)
 
       val analysis = Analysis()
         .addAnalyzer(Mean("att1"))
@@ -111,8 +111,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
         Success(3.0)))
     }
 
-    "return string length statistics" in withSparkSession { sparkSession =>
-      val df = getDfWithVariableStringLengthValues(sparkSession)
+    "return string length statistics" in withSession { Session =>
+      val df = getDfWithVariableStringLengthValues(Session)
 
       val analysis = Analysis()
         .addAnalyzer(MaxLength("att1"))
@@ -128,8 +128,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
         Success(0.0)))
     }
 
-    "return the proper exception for non existing columns" in withSparkSession { sparkSession =>
-      val df = getDfWithNumericValues(sparkSession)
+    "return the proper exception for non existing columns" in withSession { Session =>
+      val df = getDfWithNumericValues(Session)
 
       val analysis = AnalysisRunner.onData(df)
         .addAnalyzer(Mean("nonExistingColumnName"))
@@ -141,8 +141,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
     }
 
     "return the proper exception for columns which need to be numeric but are not" in
-      withSparkSession { sparkSession =>
-        val df = getDfFull(sparkSession)
+      withSession { Session =>
+        val df = getDfFull(Session)
 
         val analysis = AnalysisRunner.onData(df)
           .addAnalyzer(Mean("att2"))
@@ -154,8 +154,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
       }
 
     "return the proper exception when no columns are specified" in
-      withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val analysis = AnalysisRunner.onData(df)
           .addAnalyzer(Distinctness(Seq.empty))
@@ -167,8 +167,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
       }
 
     "return the proper exception when the number of specified columns is not correct " +
-      "(and should be greater than 1)" in withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      "(and should be greater than 1)" in withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val analysis = AnalysisRunner.onData(df)
           .addAnalyzer(MutualInformation(Seq("att2")))
@@ -180,8 +180,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
       }
 
     "return the proper exception when the number of max histogram bins is too big" in
-      withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val analysis = AnalysisRunner.onData(df)
           .addAnalyzer(Histogram("att2", maxDetailBins = Integer.MAX_VALUE))
@@ -193,8 +193,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
       }
 
     "return the proper exception when a quantile number is out of range" in
-      withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val analysis = AnalysisRunner.onData(df)
           .addAnalyzer(ApproxQuantile("att2", 1.1))
@@ -206,8 +206,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
       }
 
     "return the proper exception when a quantile error number is out of range" in
-      withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val analysis = AnalysisRunner.onData(df)
           .addAnalyzer(ApproxQuantile("att2", 0.5, - 0.1))
@@ -219,8 +219,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
       }
 
     "return a custom generic exception that wraps any other exception that " +
-      "occurred while calculating the metric" in withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      "occurred while calculating the metric" in withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val meanException = new IllegalArgumentException("-test-mean-failing-")
         val failingMean = new Mean("att1") {
@@ -241,8 +241,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
   "Scan-shareable Analysis" should {
 
     "not fail all the analyzers in case of an exception in producing state from aggregation" in
-      withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val meanException = new IllegalArgumentException("-test-mean-failing-")
         val failingMean = new Mean("att1") {
@@ -269,8 +269,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
     }
 
     "fail all analyzers in case of aggregation computation failure" in
-      withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val aggregationException = new IllegalArgumentException("-test-agg-failing-")
         val aggFailingMean = new Mean("att1") {
@@ -299,8 +299,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
   "Grouping Analysis" should {
 
     "not fail all the analyzers in case of an exception in producing state from aggregation" in
-      withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val distinctnessException = new IllegalArgumentException("-test-distinctness-failing-")
         val failingDistinctness = new Distinctness("att1" :: Nil) {
@@ -328,8 +328,8 @@ class AnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec with 
       }
 
     "fail all analyzers in case of aggregation computation failure" in
-      withSparkSession { sparkSession =>
-        val df = getDfWithNumericValues(sparkSession)
+      withSession { Session =>
+        val df = getDfWithNumericValues(Session)
 
         val aggregationException = new IllegalArgumentException("-test-agg-failing-")
         val failingDistinctness = new Distinctness("att1" :: Nil) {

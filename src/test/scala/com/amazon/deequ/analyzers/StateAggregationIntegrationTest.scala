@@ -22,16 +22,16 @@ import com.amazon.deequ.checks.{Check, CheckLevel}
 import com.amazon.deequ.examples.{ExampleUtils, Item}
 import com.amazon.deequ.utils.FixtureSupport
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import com.snowflake.snowpark.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.matchers.should.Matchers
-import org.apache.spark.sql.functions.expr
+import com.snowflake.snowpark.functions.expr
 import org.scalatest.wordspec.AnyWordSpec
 
 class StateAggregationIntegrationTest extends AnyWordSpec with Matchers with SparkContextSpec
   with FixtureSupport {
 
   "State aggregation" should {
-    "work correctly over data partitions" in withSparkSession { session =>
+    "work correctly over data partitions" in withSession { session =>
 
       val schema = StructType(
         StructField("item", StringType, nullable = false) ::
@@ -129,7 +129,7 @@ class StateAggregationIntegrationTest extends AnyWordSpec with Matchers with Spa
       assert(overallDistinctness == distinctness.calculate(data))
     }
 
-    "work correctly via AnalysisRunner" in withSparkSession { session =>
+    "work correctly via AnalysisRunner" in withSession { session =>
 
       val schema = StructType(
         StructField("item", StringType, nullable = false) ::
@@ -195,7 +195,7 @@ class StateAggregationIntegrationTest extends AnyWordSpec with Matchers with Spa
       assert(aggregatedStates.load(ApproxCountDistinct("item")).isDefined)
     }
 
-    "work correctly via VerificationSuite" in withSparkSession { session =>
+    "work correctly via VerificationSuite" in withSession { session =>
 
       val schema = StructType(
         StructField("item", StringType, nullable = false) ::
@@ -250,7 +250,7 @@ class StateAggregationIntegrationTest extends AnyWordSpec with Matchers with Spa
       assert(resultsFromStates == resultsDirect)
     }
 
-    "not throw errors for the example from DEEQU-189" in withSparkSession { session =>
+    "not throw errors for the example from DEEQU-189" in withSession { session =>
 
       val data = ExampleUtils.itemsAsDataframe(session,
         Item(1, "Thingy A", "awesome thing.", "high", 0),

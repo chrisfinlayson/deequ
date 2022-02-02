@@ -18,10 +18,11 @@ package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.Analyzers._
 import com.amazon.deequ.metrics.{DoubleMetric, Entity, Metric}
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
+import com.snowflake.snowpark.functions._
+import com.snowflake.snowpark.types._
+import com.snowflake.snowpark.{Column, DataFrame, Row, Session}
 import com.amazon.deequ.analyzers.runners._
+import com.snowflake.snowpark.Column.expr
 
 import scala.language.existentials
 import scala.util.{Failure, Success}
@@ -290,7 +291,7 @@ object Preconditions {
   private[this] val nestedDataTypes = Set(StructType, MapType, ArrayType)
 
   private[this] val caseSensitive = {
-    SparkSession.builder().getOrCreate()
+    Session.builder.create().getOrCreate()
     .sqlContext.getConf("spark.sql.caseSensitive").equalsIgnoreCase("true")
   }
 
@@ -306,7 +307,7 @@ object Preconditions {
 
   def hasColumn(column: String, schema: StructType): Boolean = {
     if (caseSensitive) {
-      schema.fieldNames.contains(column)
+      schema.fields.contains(column)
     } else {
       schema.fieldNames.find(_.equalsIgnoreCase(column)).isDefined
     }

@@ -23,7 +23,7 @@ import com.amazon.deequ.analyzers.runners.{AnalysisRunner, AnalyzerContext}
 import com.amazon.deequ.metrics.{DoubleMetric, Entity, Metric}
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
 import com.amazon.deequ.utils.{FixtureSupport, TempFileUtils}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import AnalyzerContext._
 import com.amazon.deequ.SparkContextSpec
 import org.scalatest.wordspec.AnyWordSpec
@@ -43,7 +43,7 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
 
   "File System Repository" should {
 
-    "save and retrieve AnalyzerContexts" in withSparkSession { session =>
+    "save and retrieve AnalyzerContexts" in withSession { session =>
       evaluate(session) { (results, repository) =>
 
         val resultKey = ResultKey(DATE_ONE, REGION_EU)
@@ -59,7 +59,7 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
       }
     }
 
-    "save should ignore failed result metrics when saving" in withSparkSession { session =>
+    "save should ignore failed result metrics when saving" in withSession { session =>
 
       val metrics: Map[Analyzer[_, Metric[_]], Metric[_]] = Map(
         Size() -> DoubleMetric(Entity.Column, "Size", "*", Success(5.0)),
@@ -85,7 +85,7 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
       assert(resultsWithSuccessfulValues == loadedAnalyzerContext)
     }
 
-    "saving should work for very long strings as well" in withSparkSession { session =>
+    "saving should work for very long strings as well" in withSession { session =>
       evaluate(session) { (results, repository) =>
 
         (1 to 200).foreach(number => repository.save(ResultKey(number, Map.empty), results))
@@ -96,7 +96,7 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
       }
     }
 
-    "save and retrieve AnalysisResults" in withSparkSession { session =>
+    "save and retrieve AnalysisResults" in withSession { session =>
 
       evaluate(session) { (results, repository) =>
 
@@ -126,9 +126,9 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
     }
 
     "only load AnalysisResults within a specific time frame if requested" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        evaluate(sparkSession) { (results, repository) =>
+        evaluate(Session) { (results, repository) =>
 
           repository.save(ResultKey(DATE_ONE, REGION_EU), results)
           repository.save(ResultKey(DATE_TWO, REGION_NA), results)
@@ -137,9 +137,9 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
           val analysisResultsAsDataFrame = repository.load()
             .after(DATE_TWO)
             .before(DATE_TWO)
-            .getSuccessMetricsAsDataFrame(sparkSession)
+            .getSuccessMetricsAsDataFrame(Session)
 
-          import sparkSession.implicits._
+          import Session.implicits._
           val expected = Seq(
             // Second analysisResult
             ("Dataset", "*", "Size", 4.0, DATE_TWO, "NA"),
@@ -152,7 +152,7 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
         }
       }
 
-    "only load AnalyzerContexts with specific Tags if requested" in withSparkSession { session =>
+    "only load AnalyzerContexts with specific Tags if requested" in withSession { session =>
 
       evaluate(session) { (results, repository) =>
 
@@ -178,9 +178,9 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
     }
 
     "only include specific metrics in loaded AnalysisResults if requested" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        evaluate(sparkSession) { (results, repository) =>
+        evaluate(Session) { (results, repository) =>
 
           repository.save(ResultKey(DATE_ONE, REGION_EU), results)
           repository.save(ResultKey(DATE_TWO, REGION_NA), results)
@@ -188,9 +188,9 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
           val analysisResultsAsDataFrame = repository.load()
             .after(DATE_ONE)
             .forAnalyzers(Seq(Completeness("att1"), Uniqueness(Seq("att1", "att2"))))
-            .getSuccessMetricsAsDataFrame(sparkSession)
+            .getSuccessMetricsAsDataFrame(Session)
 
-          import sparkSession.implicits._
+          import Session.implicits._
           val expected = Seq(
             // First analysisResult
             ("Column", "att1", "Completeness", 1.0, DATE_ONE, "EU"),
@@ -204,7 +204,7 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
         }
       }
 
-    "include no metrics in loaded AnalysisResults if requested" in withSparkSession { session =>
+    "include no metrics in loaded AnalysisResults if requested" in withSession { session =>
 
       evaluate(session) { (results, repository) =>
 
@@ -224,7 +224,7 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
       }
     }
 
-    "return empty Seq if load parameters too restrictive" in withSparkSession { session =>
+    "return empty Seq if load parameters too restrictive" in withSession { session =>
 
       evaluate(session) { (results, repository) =>
 
@@ -241,7 +241,7 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
     }
   }
 
-  private[this] def evaluate(session: SparkSession)
+  private[this] def evaluate(session: Session)
     (test: ( AnalyzerContext, MetricsRepository) => Unit): Unit = {
 
     val data = getDfFull(session)
@@ -263,9 +263,9 @@ class FileSystemMetricsRepositoryTest extends AnyWordSpec
     LocalDate.of(year, month, day).atTime(10, 10, 10).toEpochSecond(ZoneOffset.UTC)
   }
 
-  private[this] def createRepository(sparkSession: SparkSession): MetricsRepository = {
+  private[this] def createRepository(Session: Session): MetricsRepository = {
     val tempDir = TempFileUtils.tempDir("fileSystemRepositoryTest")
-    new FileSystemMetricsRepository(sparkSession, tempDir)
+    new FileSystemMetricsRepository(Session, tempDir)
   }
 
   private[this] def assertSameRows(dataFrameA: DataFrame, dataFrameB: DataFrame): Unit = {

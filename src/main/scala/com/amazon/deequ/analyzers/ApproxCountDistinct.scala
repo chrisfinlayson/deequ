@@ -19,8 +19,8 @@ package com.amazon.deequ.analyzers
 import com.amazon.deequ.analyzers.Preconditions.hasColumn
 import org.apache.spark.sql.DeequFunctions.stateful_approx_count_distinct
 import org.apache.spark.sql.catalyst.expressions.aggregate.DeequHyperLogLogPlusPlusUtils
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{Column, Row}
+import com.snowflake.snowpark.types.StructType
+import com.snowflake.snowpark.{Column, Row}
 import Analyzers._
 
 case class ApproxCountDistinctState(words: Array[Long])

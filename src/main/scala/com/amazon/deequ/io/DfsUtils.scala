@@ -16,15 +16,16 @@
 
 package com.amazon.deequ.io
 
-import java.io.{BufferedWriter, OutputStreamWriter}
+import com.snowflake.snowpark.Session
 
+import java.io.{BufferedWriter, OutputStreamWriter}
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileSystem, Path}
-import org.apache.spark.sql.SparkSession
+
 
 private[deequ] object DfsUtils {
 
   /* Helper function to read from a binary file on S3 */
-  def readFromFileOnDfs[T](session: SparkSession, path: String)
+  def readFromFileOnDfs[T](session: Session, path: String)
     (readFunc: FSDataInputStream => T): T = {
 
     val (fs, qualifiedPath) = asQualifiedPath(session, path)
@@ -40,7 +41,7 @@ private[deequ] object DfsUtils {
   }
 
   /* Helper function to write to a binary file on S3 */
-  def writeToFileOnDfs(session: SparkSession, path: String, overwrite: Boolean = false)
+  def writeToFileOnDfs(session: Session, path: String, overwrite: Boolean = false)
     (writeFunc: FSDataOutputStream => Unit): Unit = {
 
     val (fs, qualifiedPath) = asQualifiedPath(session, path)
@@ -56,7 +57,7 @@ private[deequ] object DfsUtils {
   }
 
   /* Helper function to write to a binary file on S3 */
-  def writeToTextFileOnDfs(session: SparkSession, path: String, overwrite: Boolean = false)
+  def writeToTextFileOnDfs(session: Session, path: String, overwrite: Boolean = false)
     (writeFunc: BufferedWriter => Unit): Unit = {
 
     val (fs, qualifiedPath) = asQualifiedPath(session, path)
@@ -74,7 +75,7 @@ private[deequ] object DfsUtils {
   }
 
   /* Make sure we write to the correct filesystem, as EMR clusters also have an internal HDFS */
-  def asQualifiedPath(session: SparkSession, path: String): (FileSystem, Path) = {
+  def asQualifiedPath(session: Session, path: String): (FileSystem, Path) = {
     val hdfsPath = new Path(path)
     val fs = hdfsPath.getFileSystem(session.sparkContext.hadoopConfiguration)
     val qualifiedPath = hdfsPath.makeQualified(fs.getUri, fs.getWorkingDirectory)

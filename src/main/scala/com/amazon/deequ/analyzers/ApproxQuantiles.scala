@@ -20,8 +20,8 @@ import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isNumeric}
 import com.amazon.deequ.analyzers.runners.{IllegalAnalyzerParameterException, MetricCalculationException}
 import com.amazon.deequ.metrics.{Entity, KeyedDoubleMetric}
 import org.apache.spark.sql.catalyst.expressions.aggregate.ApproximatePercentile
-import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.types.StructType
+import com.snowflake.snowpark.functions.col
+import com.snowflake.snowpark.types.StructType
 import org.apache.spark.sql.{DeequFunctions, Row}
 import scala.util.{Failure, Success}
 

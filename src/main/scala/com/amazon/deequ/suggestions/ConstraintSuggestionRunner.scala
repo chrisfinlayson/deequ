@@ -23,9 +23,9 @@ import com.amazon.deequ.io.DfsUtils
 import com.amazon.deequ.profiles.{ColumnProfile, ColumnProfilerRunner, ColumnProfiles}
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
 import com.amazon.deequ.suggestions.rules._
-import org.apache.spark.annotation.Experimental
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, SparkSession}
+//import org.apache.spark.annotation.Experimental
+import com.snowflake.snowpark.types.StructType
+import com.snowflake.snowpark.{DataFrame, Session}
 
 object Rules {
 
@@ -42,7 +42,7 @@ private[suggestions] case class ConstraintSuggestionMetricsRepositoryOptions(
       saveOrAppendResultsKey: Option[ResultKey])
 
 private[suggestions] case class ConstraintSuggestionFileOutputOptions(
-      session: Option[SparkSession],
+      session: Option[Session],
       saveColumnProfilesJsonToPath: Option[String],
       saveConstraintSuggestionsJsonToPath: Option[String],
       saveEvaluationResultsJsonToPath: Option[String],
@@ -53,7 +53,7 @@ private[suggestions] case class ConstraintSuggestionFileOutputOptions(
   * the data at hand.
   *
   */
-@Experimental
+//@Experimental
 class ConstraintSuggestionRunner {
 
   def onData(data: DataFrame): ConstraintSuggestionRunBuilder = {
@@ -108,9 +108,9 @@ class ConstraintSuggestionRunner {
       columnProfiles
     )
 
-    if (cacheInputs) {
-      trainingData.unpersist()
-    }
+//    if (cacheInputs) {
+//      trainingData.unpersist()
+//    }
 
     saveConstraintSuggestionJsonToFileSystemIfNecessary(
       fileOutputOptions,

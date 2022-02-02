@@ -22,7 +22,7 @@ import com.amazon.deequ.metrics.{BucketDistribution, BucketValue}
 import com.amazon.deequ.profiles.{ColumnProfiler, NumericColumnProfile}
 import com.amazon.deequ.utils.FixtureSupport
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types._
+import com.snowflake.snowpark.types._
 import org.scalatest.{Matchers, WordSpec}
 
 class KLLProfileTest extends WordSpec with Matchers with SparkContextSpec
@@ -52,7 +52,7 @@ class KLLProfileTest extends WordSpec with Matchers with SparkContextSpec
   "Column Profiler" should {
 
     "return correct NumericColumnProfiles for numeric columns with correct DataType" in
-      withSparkSession { session =>
+      withSession { session =>
 
         val data = getDfWithNumericFractionalValues(session)
 
@@ -92,7 +92,7 @@ class KLLProfileTest extends WordSpec with Matchers with SparkContextSpec
       }
 
     "return correct NumericColumnProfiles With KLL for numeric columns with correct DataType" in
-      withSparkSession { session =>
+      withSession { session =>
 
         val data = getDfWithNumericFractionalValuesForKLL(session)
 
@@ -126,7 +126,7 @@ class KLLProfileTest extends WordSpec with Matchers with SparkContextSpec
           actualColumnProfile.asInstanceOf[NumericColumnProfile])
       }
 
-    "return KLL Sketches for ShortType columns" in withSparkSession { session =>
+    "return KLL Sketches for ShortType columns" in withSession { session =>
       val attribute = "attribute"
       val data = com.amazon.deequ.dataFrameWithColumn(
         attribute,

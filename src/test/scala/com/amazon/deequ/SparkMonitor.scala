@@ -19,10 +19,10 @@ package com.amazon.deequ
 import org.apache.spark.scheduler.{SparkListener, SparkListenerJobStart, SparkListenerStageCompleted, StageInfo}
 
 /**
-  * A class representing a statistics about a sparkSession.
+  * A class representing a statistics about a Session.
   * Currently, only number of spark jobs submitted and its stages are being tracked.
   */
-class SparkSessionStats {
+class SessionStats {
   private var numberOfJobsSubmitted = 0
   private var stageInfos = Seq[StageInfo]()
 
@@ -53,7 +53,7 @@ class SparkSessionStats {
   * A SparkListener implementation to monitor spark jobs submitted
   */
 class SparkMonitor extends SparkListener {
-  val stat = new SparkSessionStats
+  val stat = new SessionStats
 
   override def onJobStart(jobStart: SparkListenerJobStart) {
     stat.recordJobStart(jobStart)
@@ -69,11 +69,11 @@ class SparkMonitor extends SparkListener {
   }
 
   /**
-    * @param testFun thunk to run with SparkSessionStats as an argument.
+    * @param testFun thunk to run with SessionStats as an argument.
     *                Provides a monitoring session where the stats are being reset at the beginning
     *
     */
-  def withMonitoringSession(testFun: (SparkSessionStats) => Any): Any = {
+  def withMonitoringSession(testFun: (SessionStats) => Any): Any = {
     stat.reset
     testFun(stat)
   }

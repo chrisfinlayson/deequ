@@ -25,7 +25,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import com.amazon.deequ.analyzers._
 import com.amazon.deequ.analyzers.runners.{AnalysisRunner, AnalyzerContext}
 import com.amazon.deequ.repository.memory.InMemoryMetricsRepository
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 
 class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matchers
   with SparkContextSpec with FixtureSupport {
@@ -42,7 +42,7 @@ class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matche
   "RepositoryMultipleResultsLoader" should {
 
     "correctly return a DataFrame of multiple AnalysisResults that is formatted as expected" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { (results, repository) =>
 
@@ -71,7 +71,7 @@ class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matche
     }
 
     "correctly return Json of multiple AnalysisResults that is formatted as expected" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { (results, repository) =>
 
@@ -107,7 +107,7 @@ class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matche
       }
 
     "return empty DataFrame if get returns an empty Sequence of AnalysisResults" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { (results, repository) =>
 
@@ -128,7 +128,7 @@ class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matche
     }
 
     "return empty Json Array if get returns an empty Sequence of AnalysisResults" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { (results, repository) =>
 
@@ -147,7 +147,7 @@ class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matche
       }
 
     "support saving data with different tags and returning DataFrame with them" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { (results, repository) =>
 
@@ -185,7 +185,7 @@ class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matche
     }
 
     "support saving data with different tags and returning Json with them" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { (results, repository) =>
 
@@ -232,7 +232,7 @@ class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matche
       }
   }
 
-  private[this] def evaluate(session: SparkSession)
+  private[this] def evaluate(session: Session)
       (test: (AnalyzerContext, MetricsRepository) => Unit)
     : Unit = {
 

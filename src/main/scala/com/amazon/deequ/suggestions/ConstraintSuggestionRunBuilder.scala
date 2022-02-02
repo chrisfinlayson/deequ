@@ -20,7 +20,7 @@ import com.amazon.deequ.analyzers.{DataTypeInstances, KLLParameters}
 import com.amazon.deequ.profiles.{ColumnProfile, ColumnProfiler}
 import com.amazon.deequ.repository._
 import com.amazon.deequ.suggestions.rules.ConstraintRule
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 
 /** A class to build a Constraint Suggestion run using a fluent API */
 class ConstraintSuggestionRunBuilder(val data: DataFrame) {
@@ -39,7 +39,7 @@ class ConstraintSuggestionRunBuilder(val data: DataFrame) {
   protected var failIfResultsForReusingMissing: Boolean = false
   protected var saveOrAppendResultsKey: Option[ResultKey] = None
 
-  protected var sparkSession: Option[SparkSession] = None
+  protected var Session: Option[Session] = None
   protected var overwriteOutputFiles: Boolean = false
   protected var saveColumnProfilesJsonPath: Option[String] = None
   protected var saveConstraintSuggestionsJsonPath: Option[String] = None
@@ -65,7 +65,7 @@ class ConstraintSuggestionRunBuilder(val data: DataFrame) {
     failIfResultsForReusingMissing = constraintSuggestionRunBuilder.failIfResultsForReusingMissing
     saveOrAppendResultsKey = constraintSuggestionRunBuilder.saveOrAppendResultsKey
 
-    sparkSession = constraintSuggestionRunBuilder.sparkSession
+    Session = constraintSuggestionRunBuilder.Session
     overwriteOutputFiles = constraintSuggestionRunBuilder.overwriteOutputFiles
     saveColumnProfilesJsonPath = constraintSuggestionRunBuilder.saveColumnProfilesJsonPath
     saveConstraintSuggestionsJsonPath = constraintSuggestionRunBuilder
@@ -187,15 +187,15 @@ class ConstraintSuggestionRunBuilder(val data: DataFrame) {
   }
 
   /**
-    * Use a sparkSession to conveniently create output files
+    * Use a Session to conveniently create output files
     *
-    * @param sparkSession The SparkSession
+    * @param Session The Session
     */
-  def useSparkSession(
-      sparkSession: SparkSession)
-    : ConstraintSuggestionRunBuilderWithSparkSession = {
+  def useSession(
+      Session: Session)
+    : ConstraintSuggestionRunBuilderWithSession = {
 
-    new ConstraintSuggestionRunBuilderWithSparkSession(this, Option(sparkSession))
+    new ConstraintSuggestionRunBuilderWithSession(this, Option(Session))
   }
 
   def run(): ConstraintSuggestionResult = {
@@ -211,7 +211,7 @@ class ConstraintSuggestionRunBuilder(val data: DataFrame) {
         testsetSplitRandomSeed),
       cacheInputs,
       ConstraintSuggestionFileOutputOptions(
-        sparkSession,
+        Session,
         saveColumnProfilesJsonPath,
         saveConstraintSuggestionsJsonPath,
         saveEvaluationResultsJsonPath,
@@ -281,12 +281,12 @@ class ConstraintSuggestionRunBuilderWithRepository(
   }
 }
 
-class ConstraintSuggestionRunBuilderWithSparkSession(
+class ConstraintSuggestionRunBuilderWithSession(
     constraintSuggestionRunBuilder: ConstraintSuggestionRunBuilder,
-    usingSparkSession: Option[SparkSession])
+    usingSession: Option[Session])
   extends ConstraintSuggestionRunBuilder(constraintSuggestionRunBuilder) {
 
-  sparkSession = usingSparkSession
+  Session = usingSession
 
   /**
     * Save the column profiles json to e.g. S3

@@ -18,9 +18,9 @@ package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.Analyzers._
 import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isString}
-import org.apache.spark.sql.functions.{length, min}
-import org.apache.spark.sql.types.{DoubleType, StructType}
-import org.apache.spark.sql.{Column, Row}
+import com.snowflake.snowpark.functions.{length, min}
+import com.snowflake.snowpark.types.{DoubleType, StructType}
+import com.snowflake.snowpark.{Column, Row}
 
 case class MinLength(column: String, where: Option[String] = None)
   extends StandardScanShareableAnalyzer[MinState]("MinLength", column)

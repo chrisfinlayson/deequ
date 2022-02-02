@@ -17,11 +17,11 @@
 package com.amazon.deequ.analyzers
 
 import org.apache.spark.sql.{Column, DataFrame, Row}
-import org.apache.spark.sql.functions.{coalesce, col, count, expr, lit}
+import com.snowflake.snowpark.functions.{coalesce, col, count, expr, lit}
 import Analyzers.COUNT_COL
 import com.amazon.deequ.metrics.DoubleMetric
 import Analyzers._
-import org.apache.spark.sql.types.StructType
+import com.snowflake.snowpark.types.StructType
 import Preconditions._
 import com.amazon.deequ.analyzers.runners.MetricCalculationException
 

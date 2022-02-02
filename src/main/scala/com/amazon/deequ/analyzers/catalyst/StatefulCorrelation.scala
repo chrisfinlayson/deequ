@@ -18,7 +18,7 @@ package org.apache.spark.sql
 
 import org.apache.spark.sql.catalyst.expressions.aggregate.Corr
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.types._
+import com.snowflake.snowpark.types._
 
 /** Adjusted version of org.apache.spark.sql.catalyst.expressions.aggregate.Corr */
 private[sql] class StatefulCorrelation(

@@ -22,7 +22,7 @@ import com.amazon.deequ.analyzers.Histogram.NullFieldReplacement
 import com.amazon.deequ.metrics.{BucketDistribution, BucketValue, Distribution, DistributionValue}
 import com.amazon.deequ.utils.FixtureSupport
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types._
+import com.snowflake.snowpark.types._
 import org.scalatest.{Matchers, WordSpec}
 
 class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
@@ -50,7 +50,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
 
   "Column Profiler" should {
 
-    "return correct StandardColumnProfiles" in withSparkSession { session =>
+    "return correct StandardColumnProfiles" in withSession { session =>
 
       val data = getDfCompleteAndInCompleteColumns(session)
 
@@ -75,7 +75,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       assert(actualColumnProfile == expectedColumnProfile)
     }
 
-    "return correct columnProfiles with predefined dataType" in withSparkSession { session =>
+    "return correct columnProfiles with predefined dataType" in withSession { session =>
 
       val data = getDfCompleteAndInCompleteColumns(session)
 
@@ -96,7 +96,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       assert(actualColumnProfile == expectedColumnProfile)
     }
 
-    "return correct columnProfiles without predefined dataType" in withSparkSession { session =>
+    "return correct columnProfiles without predefined dataType" in withSession { session =>
 
       val data = getDfCompleteAndInCompleteColumns(session)
 
@@ -125,7 +125,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
 
 
     "return correct NumericColumnProfiles for numeric String DataType columns" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val data = getDfCompleteAndInCompleteColumns(session)
 
@@ -164,7 +164,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
           actualColumnProfile.asInstanceOf[NumericColumnProfile])
     }
     "return correct NumericColumnProfiles for numeric String DataType columns when " +
-      "kllProfiling disabled" in withSparkSession { session =>
+      "kllProfiling disabled" in withSession { session =>
 
         val data = getDfCompleteAndInCompleteColumns(session)
 
@@ -204,7 +204,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       }
 
     "return correct NumericColumnProfiles for numeric String DataType columns when " +
-      " kllProfiling enabled" in withSparkSession { session =>
+      " kllProfiling enabled" in withSession { session =>
 
         val data = getDfCompleteAndInCompleteColumns(session)
 
@@ -281,7 +281,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       }
 
     "return correct NumericColumnProfiles for numeric columns with correct DataType" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val data = getDfWithNumericFractionalValues(session)
 
@@ -314,7 +314,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
           actualColumnProfile.asInstanceOf[NumericColumnProfile])
     }
 
-    "return correct Histograms for string columns" in withSparkSession { session =>
+    "return correct Histograms for string columns" in withSession { session =>
 
       val data = getDfCompleteAndInCompleteColumns(session)
 
@@ -342,7 +342,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       assert(actualColumnProfile == expectedColumnProfile)
     }
 
-    "return histograms for boolean columns" in withSparkSession { session =>
+    "return histograms for boolean columns" in withSession { session =>
       val attribute = "attribute"
       val nRows = 6
       val data = com.amazon.deequ.dataFrameWithColumn(
@@ -371,7 +371,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       assert(histogram(NullFieldReplacement).ratio == 1.0 / nRows)
     }
 
-    "return histograms for IntegerType columns" in withSparkSession { session =>
+    "return histograms for IntegerType columns" in withSession { session =>
       val attribute = "attribute"
       val nRows = 6
       val data = com.amazon.deequ.dataFrameWithColumn(
@@ -400,7 +400,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       assert(histogram(NullFieldReplacement).ratio == 1.0 / nRows)
     }
 
-    "return histograms for LongType columns" in withSparkSession { session =>
+    "return histograms for LongType columns" in withSession { session =>
       val attribute = "attribute"
       val nRows = 6
       val data = com.amazon.deequ.dataFrameWithColumn(
@@ -429,7 +429,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       assert(histogram(NullFieldReplacement).ratio == 1.0 / nRows)
     }
 
-    "return histograms for DoubleType columns" in withSparkSession { session =>
+    "return histograms for DoubleType columns" in withSession { session =>
       val attribute = "attribute"
       val nRows = 6
       val data = com.amazon.deequ.dataFrameWithColumn(
@@ -458,7 +458,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       assert(histogram(NullFieldReplacement).ratio == 1.0 / nRows)
     }
 
-    "return histograms for FloatType columns" in withSparkSession { session =>
+    "return histograms for FloatType columns" in withSession { session =>
       val attribute = "attribute"
       val nRows = 6
       val data = com.amazon.deequ.dataFrameWithColumn(
@@ -487,7 +487,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
       assert(histogram(NullFieldReplacement).ratio == 1.0 / nRows)
     }
 
-    "return histograms for ShortType columns" in withSparkSession { session =>
+    "return histograms for ShortType columns" in withSession { session =>
       val attribute = "attribute"
       val nRows = 6
       val data = com.amazon.deequ.dataFrameWithColumn(
@@ -517,7 +517,7 @@ class ColumnProfilerTest extends WordSpec with Matchers with SparkContextSpec
     }
   }
 
-  "return correct profile for the Titanic dataset" in withSparkSession { session =>
+  "return correct profile for the Titanic dataset" in withSession { session =>
     val data = session.read.format("csv")
       .option("inferSchema", "true")
       .option("header", "true")

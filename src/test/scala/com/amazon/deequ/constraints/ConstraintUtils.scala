@@ -16,7 +16,7 @@
 
 package com.amazon.deequ.constraints
 
-import org.apache.spark.sql.DataFrame
+import com.snowflake.snowpark.DataFrame
 
 object ConstraintUtils {
 

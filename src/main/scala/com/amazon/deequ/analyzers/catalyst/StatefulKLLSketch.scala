@@ -23,7 +23,7 @@ import com.amazon.deequ.analyzers.catalyst.KLLSketchSerializer
 import com.google.common.primitives.Doubles
 
 import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
-import org.apache.spark.sql.types._
+import com.snowflake.snowpark.types._
 
 
 private [sql] class StatefulKLLSketch(

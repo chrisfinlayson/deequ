@@ -21,7 +21,7 @@ import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult.{TypeCheckFailure, TypeCheckSuccess}
 import org.apache.spark.sql.catalyst.expressions.aggregate.ApproximatePercentile.PercentileDigest
 import org.apache.spark.sql.catalyst.expressions.{Expression, ImplicitCastInputTypes, Literal}
-import org.apache.spark.sql.types._
+import com.snowflake.snowpark.types._
 
 /** Adjusted version of org.apache.spark.sql.catalyst.expressions.aggregate.ApproximatePercentile
   * (github tag v2.2.0) */

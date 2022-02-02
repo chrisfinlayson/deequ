@@ -24,8 +24,8 @@ import com.amazon.deequ.analyzers.runners.{AnalysisRunBuilder, AnalysisRunner, A
 import com.amazon.deequ.metrics._
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
 
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.types.{BooleanType, DecimalType, DoubleType, FloatType, IntegerType, LongType, ShortType, StringType, StructType, TimestampType, DataType => SparkDataType}
+import com.snowflake.snowpark.DataFrame
+import com.snowflake.snowpark.types.{BooleanType, DecimalType, DoubleType, FloatType, IntegerType, LongType, ShortType, StringType, StructType, TimestampType, DataType => SparkDataType}
 
 private[deequ] case class GenericColumnStatistics(
     numRecords: Long,

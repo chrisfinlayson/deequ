@@ -20,16 +20,16 @@ import org.scalatest.{Matchers, WordSpec}
 
 class SparkBasicTest extends WordSpec with Matchers with SparkContextSpec {
   "check that initializing a spark context and a basic example works" in
-    withSparkSession { sparkSession =>
-      val sc = sparkSession.sparkContext
+    withSession { Session =>
+      val sc = Session.sparkContext
       val xs = sc.parallelize(1 to 100)
       val res = xs.sum()
       res should be(5050)
     }
 
   "check that monitoring spark session works" in
-    withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
-      val sc = sparkSession.sparkContext
+    withMonitorableSession { (Session, sparkMonitor) =>
+      val sc = Session.sparkContext
       val xs = sc.parallelize(1 to 100)
 
 

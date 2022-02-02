@@ -22,7 +22,7 @@ import com.amazon.deequ.constraints.{AnalysisBasedConstraint, Constraint, Constr
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.suggestions.rules.{NonNegativeNumbersRule, UniqueIfApproximatelyUniqueRule}
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.IntegerType
+import com.snowflake.snowpark.types.IntegerType
 import org.scalatest.WordSpec
 
 import scala.util.Random
@@ -42,7 +42,7 @@ class ConstraintSuggestionsIntegrationTest extends WordSpec with SparkContextSpe
 
   "Suggestions" should {
 
-    "return expected candidates" in withSparkSession { session =>
+    "return expected candidates" in withSession { session =>
 
       val numRecords = 10000
       val rng = new Random(0)
@@ -185,9 +185,9 @@ class ConstraintSuggestionsIntegrationTest extends WordSpec with SparkContextSpe
 
     }
 
-    "issue non negativity constraint for positive data" in withSparkSession { sparkSession =>
+    "issue non negativity constraint for positive data" in withSession { Session =>
       val col = "some"
-      val data = dataFrameWithColumn(col, IntegerType, sparkSession, Row(0), Row(1), Row(null))
+      val data = dataFrameWithColumn(col, IntegerType, Session, Row(0), Row(1), Row(null))
 
       val results = ConstraintSuggestionRunner()
         .onData(data)
@@ -197,9 +197,9 @@ class ConstraintSuggestionsIntegrationTest extends WordSpec with SparkContextSpe
       assert(results.constraintSuggestions.size == 1)
     }
 
-    "issue non negativity constraint for data > 0" in withSparkSession { sparkSession =>
+    "issue non negativity constraint for data > 0" in withSession { Session =>
       val col = "some"
-      val data = dataFrameWithColumn(col, IntegerType, sparkSession, Row(1), Row(null))
+      val data = dataFrameWithColumn(col, IntegerType, Session, Row(1), Row(null))
 
       val results = ConstraintSuggestionRunner()
         .onData(data)

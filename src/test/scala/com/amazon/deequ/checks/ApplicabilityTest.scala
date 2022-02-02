@@ -19,7 +19,7 @@ package checks
 
 import com.amazon.deequ.analyzers.applicability.Applicability
 import com.amazon.deequ.analyzers.{Completeness, Compliance, Maximum, Minimum}
-import org.apache.spark.sql.types._
+import com.snowflake.snowpark.types._
 import org.scalatest.wordspec.AnyWordSpec
 
 class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
@@ -48,7 +48,7 @@ class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
 
   "Applicability tests for checks" should {
 
-    "recognize applicable checks as applicable" in withSparkSession { session =>
+    "recognize applicable checks as applicable" in withSession { session =>
 
       val applicability = new Applicability(session)
 
@@ -66,7 +66,7 @@ class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
       }
     }
 
-    "detect checks with non existing columns" in withSparkSession { session =>
+    "detect checks with non existing columns" in withSession { session =>
 
       val applicability = new Applicability(session)
 
@@ -85,7 +85,7 @@ class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
       }
     }
 
-    "detect checks with invalid sql expressions" in withSparkSession { session =>
+    "detect checks with invalid sql expressions" in withSession { session =>
 
       val applicability = new Applicability(session)
 
@@ -109,7 +109,7 @@ class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
       assert(resultForCheckWithInvalidExpression2.failures.size == 1)
     }
 
-    "report on all constraints of the Check" in withSparkSession { session =>
+    "report on all constraints of the Check" in withSession { session =>
       val applicability = new Applicability(session)
 
       val check = Check(CheckLevel.Error, "")
@@ -128,7 +128,7 @@ class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
 
   "Applicability tests for analyzers" should {
 
-    "recognize applicable analyzers as applicable" in withSparkSession { session =>
+    "recognize applicable analyzers as applicable" in withSession { session =>
 
       val applicability = new Applicability(session)
 
@@ -140,7 +140,7 @@ class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
       assert(resultForValidAnalyzer.failures.isEmpty)
     }
 
-    "detect analyzers for non existing columns" in withSparkSession { session =>
+    "detect analyzers for non existing columns" in withSession { session =>
 
       val applicability = new Applicability(session)
 
@@ -153,7 +153,7 @@ class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
       assert(resultForAnalyzerForNonExistingColumn.failures.size == 1)
     }
 
-    "detect analyzers with invalid sql expressions" in withSparkSession { session =>
+    "detect analyzers with invalid sql expressions" in withSession { session =>
 
       val applicability = new Applicability(session)
 
@@ -175,7 +175,7 @@ class ApplicabilityTest extends AnyWordSpec with SparkContextSpec {
       assert(resultForAnalyzerWithInvalidExpression2.failures.size == 1)
     }
 
-    "handles min/max with decimal columns" in withSparkSession { session =>
+    "handles min/max with decimal columns" in withSession { session =>
 
       val applicability = new Applicability(session)
 

@@ -24,7 +24,7 @@ import com.amazon.deequ.analyzers.ApproxCountDistinctState
 import com.amazon.deequ.analyzers.catalyst.AttributeReferenceCreation
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.types._
+import com.snowflake.snowpark.types._
 import org.apache.spark.sql.catalyst.expressions.aggregate.HLLConstants._
 
 /** Adjusted version of org.apache.spark.sql.catalyst.expressions.aggregate.HyperloglogPlus */

@@ -20,8 +20,8 @@ import com.amazon.deequ.checks.{Check, CheckLevel}
 import com.amazon.deequ.repository.ResultKey
 import com.amazon.deequ.repository.fs.FileSystemMetricsRepository
 import com.amazon.deequ.utils.TempFileUtils
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import com.snowflake.snowpark.{DataFrame,Row,Session}
+import com.snowflake.snowpark.types.{IntegerType, StringType, StructField, StructType}
 import TempFileUtils._
 import com.amazon.deequ.{SparkContextSpec, VerificationResult, VerificationSuite}
 import com.amazon.deequ.constraints.ConstraintStatus
@@ -36,7 +36,7 @@ class PartitionedTableIntegrationTest extends AnyWordSpec with SparkContextSpec 
     StructField("marketplace", StringType, nullable = false) :: Nil)
 
   "Constraint checks" should {
-    "work correctly over data partitions" in withSparkSession { session =>
+    "work correctly over data partitions" in withSession { session =>
 
       // The check containing the constraints which we want to verify
       val check = Check(CheckLevel.Error, "table checks")
@@ -143,7 +143,7 @@ class PartitionedTableIntegrationTest extends AnyWordSpec with SparkContextSpec 
     }
   }
 
-  private[this] def loadPartitionA(session: SparkSession): DataFrame = {
+  private[this] def loadPartitionA(session: Session): DataFrame = {
 
     val rowsInPartitionA = Seq(
       Row("item1", "US", 100, "EU"),
@@ -153,7 +153,7 @@ class PartitionedTableIntegrationTest extends AnyWordSpec with SparkContextSpec 
   }
 
 
-  private[this] def loadPartitionB(session: SparkSession): DataFrame = {
+  private[this] def loadPartitionB(session: Session): DataFrame = {
 
     val rowsInPartitionB = Seq(
       Row("item1", "US", 1000, "NA"),

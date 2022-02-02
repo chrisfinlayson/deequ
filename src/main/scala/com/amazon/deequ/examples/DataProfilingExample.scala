@@ -18,6 +18,8 @@ package com.amazon.deequ.examples
 
 import com.amazon.deequ.examples.ExampleUtils.withSpark
 import com.amazon.deequ.profiles.{ColumnProfilerRunner, NumericColumnProfile}
+import com.snowflake.snowpark._
+
 
 case class RawData(productName: String, totalNumber: String, status: String, valuable: String)
 
@@ -26,7 +28,8 @@ private[examples] object DataProfilingExample extends App {
   withSpark { session =>
 
     /* We profile raw data, mostly in string format (e.g., from a csv file) */
-    val rows = session.sparkContext.parallelize(Seq(
+    val rows = {
+      session.sparkContext.parallelize(Seq(
       RawData("thingA", "13.0", "IN_TRANSIT", "true"),
       RawData("thingA", "5", "DELAYED", "false"),
       RawData("thingB", null, "DELAYED", null),
@@ -36,6 +39,7 @@ private[examples] object DataProfilingExample extends App {
       RawData("thingC", "20", "UNKNOWN", null),
       RawData("thingE", "20", "DELAYED", "false")
     ))
+    }
 
     val rawData = session.createDataFrame(rows)
 

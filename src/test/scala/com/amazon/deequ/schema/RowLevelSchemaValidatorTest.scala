@@ -17,16 +17,16 @@
 package com.amazon.deequ.schema
 
 import com.amazon.deequ.SparkContextSpec
-import org.apache.spark.sql.types.{IntegerType, StringType, TimestampType}
+import com.snowflake.snowpark.types.{IntegerType, StringType, TimestampType}
 import org.scalatest.WordSpec
 
 class RowLevelSchemaValidatorTest extends WordSpec with SparkContextSpec {
 
   "row level schema validation" should {
 
-    "correctly enforce null constraints" in withSparkSession { sparkSession =>
+    "correctly enforce null constraints" in withSession { Session =>
 
-      import sparkSession.implicits._
+      import Session.implicits._
 
       val data = Seq(
         ("123", "Product A", "2012-07-22 22:59:59"),
@@ -55,9 +55,9 @@ class RowLevelSchemaValidatorTest extends WordSpec with SparkContextSpec {
       assert(!invalidIds.contains("456"))
     }
 
-    "correctly enforce string constraints" in withSparkSession { sparkSession =>
+    "correctly enforce string constraints" in withSession { Session =>
 
-      import sparkSession.implicits._
+      import Session.implicits._
 
       val data = Seq(
         "Hello",
@@ -83,9 +83,9 @@ class RowLevelSchemaValidatorTest extends WordSpec with SparkContextSpec {
       assert(result.invalidRows.count() == result.numInvalidRows)
     }
 
-    "correctly filter string columns according to regexes" in withSparkSession { sparkSession =>
+    "correctly filter string columns according to regexes" in withSession { Session =>
 
-      import sparkSession.implicits._
+      import Session.implicits._
 
       val data = Seq(
         "Hello",
@@ -116,9 +116,9 @@ class RowLevelSchemaValidatorTest extends WordSpec with SparkContextSpec {
       assert(result.invalidRows.count() == result.numInvalidRows)
     }
 
-    "correctly enforce integer constraints" in withSparkSession { sparkSession =>
+    "correctly enforce integer constraints" in withSession { Session =>
 
-      import sparkSession.implicits._
+      import Session.implicits._
 
       val data = Seq(
         "123",
@@ -146,9 +146,9 @@ class RowLevelSchemaValidatorTest extends WordSpec with SparkContextSpec {
       assert(result.invalidRows.count() == result.numInvalidRows)
     }
 
-    "correctly enforce decimal constraints" in withSparkSession { sparkSession =>
+    "correctly enforce decimal constraints" in withSession { Session =>
 
-      import sparkSession.implicits._
+      import Session.implicits._
 
       val data = Seq(
         "299.000",
@@ -176,9 +176,9 @@ class RowLevelSchemaValidatorTest extends WordSpec with SparkContextSpec {
       assert(result.numInvalidRows == 3)
     }
 
-    "correctly enforce timestamp constraints" in withSparkSession { sparkSession =>
+    "correctly enforce timestamp constraints" in withSession { Session =>
 
-      import sparkSession.implicits._
+      import Session.implicits._
 
       val data = Seq(
         "2012-07-22 22:59:59",
@@ -204,9 +204,9 @@ class RowLevelSchemaValidatorTest extends WordSpec with SparkContextSpec {
       assert(invalid.contains(null))
     }
 
-    "pass a simple integration test" in withSparkSession { sparkSession =>
+    "pass a simple integration test" in withSession { Session =>
 
-      import sparkSession.implicits._
+      import Session.implicits._
 
       val data = Seq(
         ("123", "Product A", "2012-07-22 22:59:59"),

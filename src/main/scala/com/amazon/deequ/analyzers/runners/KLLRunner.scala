@@ -18,7 +18,7 @@ package com.amazon.deequ.analyzers.runners
 
 import com.amazon.deequ.analyzers.{Analyzer, KLLParameters, KLLSketch, KLLState, QuantileNonSample, State, StateLoader, StatePersister}
 import com.amazon.deequ.metrics.Metric
-import org.apache.spark.sql.types.{ByteType, DoubleType, FloatType, IntegerType, LongType, ShortType, StructType}
+import com.snowflake.snowpark.types.{ByteType, DoubleType, FloatType, IntegerType, LongType, ShortType, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
 
 @SerialVersionUID(1L)

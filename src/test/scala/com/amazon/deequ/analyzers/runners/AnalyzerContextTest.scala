@@ -20,7 +20,7 @@ import com.amazon.deequ.SparkContextSpec
 import com.amazon.deequ.utils.FixtureSupport
 import com.amazon.deequ.analyzers._
 import com.amazon.deequ.repository.SimpleResultSerde
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -30,7 +30,7 @@ class AnalyzerContextTest extends AnyWordSpec
   with FixtureSupport {
 
   "AnalyzerContext" should {
-    "correctly return a DataFrame that is formatted as expected" in withSparkSession { session =>
+    "correctly return a DataFrame that is formatted as expected" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -55,7 +55,7 @@ class AnalyzerContextTest extends AnyWordSpec
     }
 
     "only include specific metrics in returned DataFrame if requested" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -75,7 +75,7 @@ class AnalyzerContextTest extends AnyWordSpec
     }
 
     "correctly return Json that is formatted as expected" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -101,7 +101,7 @@ class AnalyzerContextTest extends AnyWordSpec
       }
 
     "only include requested metrics in returned Json" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -121,7 +121,7 @@ class AnalyzerContextTest extends AnyWordSpec
       }
   }
 
-  private[this] def evaluate(session: SparkSession)(test: AnalyzerContext => Unit): Unit = {
+  private[this] def evaluate(session: Session)(test: AnalyzerContext => Unit): Unit = {
 
     val data = getDfFull(session)
 

@@ -24,7 +24,7 @@ import org.scalatest.wordspec.AnyWordSpec
 class StatesTest extends AnyWordSpec with Matchers with SparkContextSpec with FixtureSupport {
 
   "FrequenciesAndNumRows" should {
-    "merge correctly" in withSparkSession { session =>
+    "merge correctly" in withSession { session =>
 
       import session.implicits._
 

@@ -20,8 +20,8 @@ import com.amazon.deequ.SparkContextSpec
 import com.amazon.deequ.analyzers.runners.EmptyStateException
 import com.amazon.deequ.metrics.DoubleMetric
 import com.amazon.deequ.utils.FixtureSupport
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
+import com.snowflake.snowpark.{DataFrame,Row,Session}
+import com.snowflake.snowpark.types.{DoubleType, StringType, StructField, StructType}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -32,7 +32,7 @@ class NullHandlingTests extends AnyWordSpec
   with SparkContextSpec
   with FixtureSupport {
 
-  private[this] def dataWithNullColumns(session: SparkSession): DataFrame = {
+  private[this] def dataWithNullColumns(session: Session): DataFrame = {
 
     val schema = StructType(Array(
       StructField("stringCol", StringType, nullable = true),
@@ -57,7 +57,7 @@ class NullHandlingTests extends AnyWordSpec
 
   "Null columns" should {
 
-    "produce correct states" in withSparkSession { session =>
+    "produce correct states" in withSession { session =>
 
       val data = dataWithNullColumns(session)
 
@@ -96,7 +96,7 @@ class NullHandlingTests extends AnyWordSpec
       Correlation("numericCol", "numericCol2").computeStateFrom(data) shouldBe None
     }
 
-    "produce correct metrics" in withSparkSession { session =>
+    "produce correct metrics" in withSession { session =>
 
       val data = dataWithNullColumns(session)
 
@@ -128,7 +128,7 @@ class NullHandlingTests extends AnyWordSpec
       assertFailedWithEmptyState(Correlation("numericCol", "numericCol3").calculate(data))
     }
 
-    "include analyzer name in EmptyStateExceptions" in withSparkSession { session =>
+    "include analyzer name in EmptyStateExceptions" in withSession { session =>
 
       val data = dataWithNullColumns(session)
 

@@ -27,7 +27,7 @@ import com.amazon.deequ.repository.memory.InMemoryMetricsRepository
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
 import com.amazon.deequ.utils.CollectionUtils.SeqExtensions
 import com.amazon.deequ.utils.{FixtureSupport, TempFileUtils}
-import org.apache.spark.sql.DataFrame
+import com.snowflake.snowpark.DataFrame
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
@@ -39,7 +39,7 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
   "Verification Suite" should {
 
     "return the correct verification status regardless of the order of checks" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
         def assertStatusFor(data: DataFrame, checks: Check*)
                            (expectedStatus: CheckStatus.Value)
@@ -49,7 +49,7 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
           assert(verificationSuiteStatus == expectedStatus)
         }
 
-        val df = getDfCompleteAndInCompleteColumns(sparkSession)
+        val df = getDfCompleteAndInCompleteColumns(Session)
 
         val checkToSucceed = Check(CheckLevel.Error, "group-1")
           .isComplete("att1")
@@ -84,10 +84,10 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
         }
       }
 
-    "accept analysis config for mandatory analysis" in withSparkSession { sparkSession =>
+    "accept analysis config for mandatory analysis" in withSession { Session =>
 
-      import sparkSession.implicits._
-      val df = getDfFull(sparkSession)
+      import Session.implicits._
+      val df = getDfFull(Session)
 
       val result = {
         val checkToSucceed = Check(CheckLevel.Error, "group-1")
@@ -105,7 +105,7 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
 
       assert(result.status == CheckStatus.Success)
 
-      val analysisDf = AnalyzerContext.successMetricsAsDataFrame(sparkSession,
+      val analysisDf = AnalyzerContext.successMetricsAsDataFrame(Session,
         AnalyzerContext(result.metrics))
 
       val expected = Seq(
@@ -122,16 +122,16 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
 
     }
 
-    "run the analysis even there are no constraints" in withSparkSession { sparkSession =>
+    "run the analysis even there are no constraints" in withSession { Session =>
 
-      import sparkSession.implicits._
-      val df = getDfFull(sparkSession)
+      import Session.implicits._
+      val df = getDfFull(Session)
 
       VerificationSuite().onData(df).addRequiredAnalyzer(Size()).run() match {
         case result =>
           assert(result.status == CheckStatus.Success)
 
-          val analysisDf = AnalyzerContext.successMetricsAsDataFrame(sparkSession,
+          val analysisDf = AnalyzerContext.successMetricsAsDataFrame(Session,
               AnalyzerContext(result.metrics))
 
           val expected = Seq(
@@ -143,9 +143,9 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
     }
 
     "reuse existing results" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val analyzerToTestReusingResults = Distinctness(Seq("att1", "att2"))
 
@@ -178,9 +178,9 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
       }
 
     "save results if specified" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -196,9 +196,9 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
       }
 
     "only append results to repository without unnecessarily overwriting existing ones" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -223,9 +223,9 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
       }
 
     "if there are previous results in the repository new results should pre preferred in case of " +
-      "conflicts" in withSparkSession { sparkSession =>
+      "conflicts" in withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -248,10 +248,10 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
         assert(expectedAnalyzerContextOnLoadByKey == repository.loadByKey(resultKey).get)
     }
 
-    "addAnomalyCheck should work" in withSparkSession { sparkSession =>
+    "addAnomalyCheck should work" in withSession { Session =>
       evaluateWithRepositoryWithHistory { repository =>
 
-        val df = getDfWithNRows(sparkSession, 11)
+        val df = getDfWithNRows(Session, 11)
         val saveResultsWithKey = ResultKey(5, Map.empty)
 
         val analyzers = Completeness("item") :: Nil
@@ -303,10 +303,10 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
     }
 
     "addAnomalyCheck with duplicate check analyzer should work" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
       evaluateWithRepositoryWithHistory { repository =>
 
-        val df = getDfWithNRows(sparkSession, 11)
+        val df = getDfWithNRows(Session, 11)
         val saveResultsWithKey = ResultKey(5, Map.empty)
 
         val analyzers = Completeness("item") :: Nil
@@ -345,9 +345,9 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
       }
     }
 
-    "write output files to specified locations" in withSparkSession { sparkSession =>
+    "write output files to specified locations" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val checkToSucceed = Check(CheckLevel.Error, "group-1")
         .isComplete("att1") // 1.0
@@ -359,23 +359,23 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
 
       VerificationSuite().onData(df)
         .addCheck(checkToSucceed)
-        .useSparkSession(sparkSession)
+        .useSession(Session)
         .saveCheckResultsJsonToPath(checkResultsPath)
         .saveSuccessMetricsJsonToPath(successMetricsPath)
         .run()
 
-      DfsUtils.readFromFileOnDfs(sparkSession, checkResultsPath) {
+      DfsUtils.readFromFileOnDfs(Session, checkResultsPath) {
         inputStream => assert(inputStream.read() > 0)
       }
-      DfsUtils.readFromFileOnDfs(sparkSession, successMetricsPath) {
+      DfsUtils.readFromFileOnDfs(Session, successMetricsPath) {
         inputStream => assert(inputStream.read() > 0)
       }
     }
 
-    "call state persister if specified" in withSparkSession { sparkSession =>
+    "call state persister if specified" in withSession { Session =>
       val statePersister = mock[StatePersister]
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
       val analyzers = Sum("att2") :: Completeness("att1") :: Nil
       val states = SumState(18.0) :: NumMatchesAndCount(6, 6) :: Nil
 
@@ -394,10 +394,10 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
         .run()
     }
 
-    "load stored states for aggregation if specified" in withSparkSession { sparkSession =>
+    "load stored states for aggregation if specified" in withSession { Session =>
       val stateLoaderStub = stub[StateLoader]
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
       val analyzers = Sum("att2") :: Completeness("att1") :: Nil
 
       (stateLoaderStub.load[SumState] _)
@@ -418,9 +418,9 @@ class VerificationSuiteTest extends WordSpec with Matchers with SparkContextSpec
       assert(results.metrics(Completeness("att1")).value.get == 0.5)
     }
 
-    "keep order of check constraints and their results" in withSparkSession { sparkSession =>
+    "keep order of check constraints and their results" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val expectedConstraints = Seq(
         Constraint.completenessConstraint("att1", _ == 1.0),

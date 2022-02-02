@@ -19,8 +19,8 @@ package com.amazon.deequ.analyzers
 import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isNumeric}
 import com.amazon.deequ.metrics.Entity
 import org.apache.spark.sql.DeequFunctions.stateful_corr
-import org.apache.spark.sql.{Column, Row}
-import org.apache.spark.sql.types.StructType
+import com.snowflake.snowpark.{Column, Row}
+import com.snowflake.snowpark.types.StructType
 import Analyzers._
 
 case class CorrelationState(

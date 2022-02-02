@@ -22,7 +22,7 @@ import com.amazon.deequ.analyzers.runners.MetricCalculationException
 import com.amazon.deequ.constraints.ConstraintUtils.calculate
 import com.amazon.deequ.metrics.{DoubleMetric, Entity, Metric}
 import com.amazon.deequ.utils.FixtureSupport
-import org.apache.spark.sql.DataFrame
+import com.snowflake.snowpark.DataFrame
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, PrivateMethodTester, WordSpec}
 
@@ -75,8 +75,8 @@ class AnalysisBasedConstraintTest extends WordSpec with Matchers with SparkConte
   "Analysis based constraint" should {
 
     "assert correctly on values if analysis is successful" in
-      withSparkSession { sparkSession =>
-        val df = getDfMissing(sparkSession)
+      withSession { Session =>
+        val df = getDfMissing(Session)
 
         // Analysis result should equal to 1.0 for an existing column
         val resultA = calculate(AnalysisBasedConstraint[NumMatches, Double, Double](
@@ -104,10 +104,10 @@ class AnalysisBasedConstraintTest extends WordSpec with Matchers with SparkConte
       }
 
     "execute value picker on the analysis result value, if provided" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
 
-      val df = getDfMissing(sparkSession)
+      val df = getDfMissing(Session)
 
       // Analysis result should equal to 100.0 for an existing column
       assert(calculate(AnalysisBasedConstraint[NumMatches, Double, Double](
@@ -124,8 +124,8 @@ class AnalysisBasedConstraintTest extends WordSpec with Matchers with SparkConte
         ConstraintStatus.Failure)
       }
 
-    "get the analysis from the context, if provided" in withSparkSession { sparkSession =>
-      val df = getDfMissing(sparkSession)
+    "get the analysis from the context, if provided" in withSession { Session =>
+      val df = getDfMissing(Session)
 
       val emptyResults = Map.empty[Analyzer[_, Metric[_]], Metric[_]]
       val validResults = Map[Analyzer[_, Metric[_]], Metric[_]](
@@ -154,8 +154,8 @@ class AnalysisBasedConstraintTest extends WordSpec with Matchers with SparkConte
     }
 
     "execute value picker on the analysis result value retrieved from context, if provided" in
-      withSparkSession { sparkSession =>
-        val df = getDfMissing(sparkSession)
+      withSession { Session =>
+        val df = getDfMissing(Session)
         val validResults = Map[Analyzer[_, Metric[_]], Metric[_]](
           SampleAnalyzer("att1") -> SampleAnalyzer("att1").calculate(df))
 
@@ -165,12 +165,12 @@ class AnalysisBasedConstraintTest extends WordSpec with Matchers with SparkConte
       }
 
 
-    "fail on analysis if value picker is provided but fails" in withSparkSession { sparkSession =>
+    "fail on analysis if value picker is provided but fails" in withSession { Session =>
       def problematicValuePicker(value: Double): Double = {
         throw new RuntimeException("Something wrong with this picker")
       }
 
-      val df = getDfMissing(sparkSession)
+      val df = getDfMissing(Session)
 
       val emptyResults = Map.empty[Analyzer[_, Metric[_]], Metric[_]]
       val validResults = Map[Analyzer[_, Metric[_]], Metric[_]](
@@ -204,9 +204,9 @@ class AnalysisBasedConstraintTest extends WordSpec with Matchers with SparkConte
     }
 
     "fail on failed assertion function with hint in exception message if provided" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-      val df = getDfMissing(sparkSession)
+      val df = getDfMissing(Session)
 
       val failingConstraint = AnalysisBasedConstraint[NumMatches, Double, Double](
           SampleAnalyzer("att1"), _ == 0.9, hint = Some("Value should be like ...!"))
@@ -221,7 +221,7 @@ class AnalysisBasedConstraintTest extends WordSpec with Matchers with SparkConte
       }
     }
 
-    "return failed constraint for a failing assertion" in withSparkSession { session =>
+    "return failed constraint for a failing assertion" in withSession { session =>
       val msg = "-test-"
       val exception = new RuntimeException(msg)
       val df = getDfMissing(session)

@@ -23,8 +23,8 @@ import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isNotNested}
 import com.amazon.deequ.analyzers.runners.MetricCalculationException
 import com.amazon.deequ.metrics.{Distribution, DistributionValue, HistogramMetric}
 import org.apache.spark.sql.DeequFunctions.stateful_datatype
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{Column, Row}
+import com.snowflake.snowpark.types.StructType
+import com.snowflake.snowpark.{Column, Row}
 
 import scala.util.{Failure, Success}
 

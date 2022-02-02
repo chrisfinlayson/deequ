@@ -16,7 +16,7 @@
 
 package com.amazon.deequ.checks
 
-import org.apache.spark.sql.functions.{col}
+import com.snowflake.snowpark.functions.{col}
 
 private[checks] object ColumnCondition {
 

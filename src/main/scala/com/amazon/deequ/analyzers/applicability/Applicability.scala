@@ -23,8 +23,8 @@ import com.amazon.deequ.analyzers.{Analyzer, State}
 import com.amazon.deequ.checks.Check
 import com.amazon.deequ.constraints.{AnalysisBasedConstraint, Constraint, ConstraintDecorator}
 import com.amazon.deequ.metrics.Metric
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import com.snowflake.snowpark.types._
+import com.snowflake.snowpark.{DataFrame,Row,Session}
 
 import scala.util.{Failure, Random}
 
@@ -167,7 +167,7 @@ private[deequ] object Applicability {
   *
   * @param session The spark session in order to be able to create fake data
   */
-private[deequ] class Applicability(session: SparkSession) {
+private[deequ] class Applicability(session: Session) {
 
   import Applicability._
 

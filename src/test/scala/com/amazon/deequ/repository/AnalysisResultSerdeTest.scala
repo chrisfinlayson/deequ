@@ -195,9 +195,9 @@ class SimpleResultSerdeTest extends WordSpec with Matchers with SparkContextSpec
   with FixtureSupport{
 
   "serialize and deserialize success metric results with tags" in
-    withSparkSession { sparkSession =>
+    withSession { Session =>
 
-      val df = getDfFull(sparkSession)
+      val df = getDfFull(Session)
 
       val analysis = Analysis()
         .addAnalyzer(Size())

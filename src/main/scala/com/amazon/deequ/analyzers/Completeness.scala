@@ -17,10 +17,10 @@
 package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isNotNested}
-import org.apache.spark.sql.functions.sum
-import org.apache.spark.sql.types.{IntegerType, StructType}
+import com.snowflake.snowpark.functions.sum
+import com.snowflake.snowpark.types.{IntegerType, StructType}
 import Analyzers._
-import org.apache.spark.sql.{Column, Row}
+import com.snowflake.snowpark.{Column, Row}
 
 /** Completeness is the fraction of non-null values in a column of a DataFrame. */
 case class Completeness(column: String, where: Option[String] = None) extends

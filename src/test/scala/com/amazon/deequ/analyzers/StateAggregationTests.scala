@@ -19,9 +19,9 @@ package com.amazon.deequ.analyzers
 import com.amazon.deequ.SparkContextSpec
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.utils.FixtureSupport
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import org.scalatest.matchers.should.Matchers
-import org.apache.spark.sql.functions.{expr, rand}
+import com.snowflake.snowpark.functions.{expr, rand}
 import org.scalatest.wordspec.AnyWordSpec
 
 class StateAggregationTests extends AnyWordSpec with Matchers with SparkContextSpec
@@ -29,7 +29,7 @@ class StateAggregationTests extends AnyWordSpec with Matchers with SparkContextS
 
   "State aggregation outside" should {
 
-    "give correct results" in withSparkSession { session =>
+    "give correct results" in withSession { session =>
 
       correctlyAggregatesStates(session, Size())
       correctlyAggregatesStates(session, Uniqueness("attribute" :: "value" :: Nil))
@@ -45,7 +45,7 @@ class StateAggregationTests extends AnyWordSpec with Matchers with SparkContextS
   }
 
   def correctlyAggregatesStates[S <: State[S]](
-      session: SparkSession,
+      session: Session,
       analyzer: Analyzer[S, Metric[_]])
     : Unit = {
 
@@ -64,7 +64,7 @@ class StateAggregationTests extends AnyWordSpec with Matchers with SparkContextS
     assert(metricFromAggregation == metricFromCalculate)
   }
 
-  def initialData(session: SparkSession): DataFrame = {
+  def initialData(session: Session): DataFrame = {
     import session.implicits._
     Seq(
       (1, "B00BJXTG66", "2nd story llc-0-$ims_facets-0-", "extended"),
@@ -92,7 +92,7 @@ class StateAggregationTests extends AnyWordSpec with Matchers with SparkContextS
       .withColumn("numbersB", rand(0xdeadbeef))
   }
 
-  def deltaData(session: SparkSession): DataFrame = {
+  def deltaData(session: Session): DataFrame = {
     import session.implicits._
     Seq(
       (1, "B008FZTBAW", "BroadITKitem_type_keyword-0-", "jewelry-products"),

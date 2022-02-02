@@ -23,7 +23,7 @@ import com.amazon.deequ.utils.FixtureSupport
 import org.scalatest.matchers.should.Matchers
 import com.amazon.deequ.analyzers._
 import com.amazon.deequ.analyzers.runners.{AnalysisRunBuilder, AnalysisRunner, AnalyzerContext}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import org.scalatest.wordspec.AnyWordSpec
 
 class AnalysisResultTest extends AnyWordSpec
@@ -40,7 +40,7 @@ class AnalysisResultTest extends AnyWordSpec
 
   "AnalysisResult" should {
 
-    "correctly return a DataFrame that is formatted as expected" in withSparkSession { session =>
+    "correctly return a DataFrame that is formatted as expected" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -62,7 +62,7 @@ class AnalysisResultTest extends AnyWordSpec
       }
     }
 
-    "correctly return Json that is formatted as expected" in withSparkSession { session =>
+    "correctly return Json that is formatted as expected" in withSession { session =>
 
         evaluate(session) { results =>
 
@@ -87,7 +87,7 @@ class AnalysisResultTest extends AnyWordSpec
         }
     }
 
-    "only include requested metrics in returned DataFrame" in withSparkSession { session =>
+    "only include requested metrics in returned DataFrame" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -110,7 +110,7 @@ class AnalysisResultTest extends AnyWordSpec
       }
     }
 
-    "only include requested metrics in returned Json" in withSparkSession { session =>
+    "only include requested metrics in returned Json" in withSession { session =>
 
         evaluate(session) { results =>
 
@@ -135,7 +135,7 @@ class AnalysisResultTest extends AnyWordSpec
         }
       }
 
-    "turn tagNames into valid columnNames in returned DataFrame" in withSparkSession { session =>
+    "turn tagNames into valid columnNames in returned DataFrame" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -157,7 +157,7 @@ class AnalysisResultTest extends AnyWordSpec
       }
     }
 
-    "turn tagNames into valid columnNames in returned Json" in withSparkSession { session =>
+    "turn tagNames into valid columnNames in returned Json" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -182,7 +182,7 @@ class AnalysisResultTest extends AnyWordSpec
       }
     }
 
-    "avoid duplicate columnNames in returned DataFrame" in withSparkSession { session =>
+    "avoid duplicate columnNames in returned DataFrame" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -204,7 +204,7 @@ class AnalysisResultTest extends AnyWordSpec
       }
     }
 
-    "avoid duplicate columnNames in returned Json" in withSparkSession { session =>
+    "avoid duplicate columnNames in returned Json" in withSession { session =>
 
       evaluate(session) { results =>
 
@@ -230,7 +230,7 @@ class AnalysisResultTest extends AnyWordSpec
     }
 
     "only include some specific tags in returned DataFrame if requested" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -254,7 +254,7 @@ class AnalysisResultTest extends AnyWordSpec
     }
 
     "only include some specific tags in returned Json if requested" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -280,7 +280,7 @@ class AnalysisResultTest extends AnyWordSpec
         }
       }
 
-    "return empty DataFrame if AnalyzerContext contains no entries" in withSparkSession { session =>
+    "return empty DataFrame if AnalyzerContext contains no entries" in withSession { session =>
 
       val data = getDfFull(session)
 
@@ -300,7 +300,7 @@ class AnalysisResultTest extends AnyWordSpec
     }
 
     "return empty Json Array if AnalyzerContext contains no entries" in
-      withSparkSession { session =>
+      withSession { session =>
 
         val data = getDfFull(session)
 
@@ -317,7 +317,7 @@ class AnalysisResultTest extends AnyWordSpec
       }
   }
 
-  private[this] def evaluate(session: SparkSession)(test: AnalyzerContext => Unit)
+  private[this] def evaluate(session: Session)(test: AnalyzerContext => Unit)
   : Unit = {
 
     val data = getDfFull(session)

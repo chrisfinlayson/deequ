@@ -42,7 +42,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return evaluable constraint candidates" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -62,7 +62,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return working code to add constraint to check" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -99,7 +99,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return evaluable constraint candidates" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -119,7 +119,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return working code to add constraint to check" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -162,7 +162,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return evaluable constraint candidates" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -183,7 +183,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return working code to add constraint to check" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -241,7 +241,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return evaluable constraint candidates" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -262,7 +262,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return working code to add constraint to check" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -377,7 +377,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return evaluable constraint candidates" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfWithCategoricalColumn(session, 10,
         Seq("'_[a_[]}!@'", "_b%%__"))
@@ -405,7 +405,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
 
     "CategoricalRangeRule should return evaluable constraint candidates even " +
       "if category names contain potentially problematic characters" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfWithCategoricalColumn(session, 10,
         Seq("'_[a_[]}!@'", "_b%%__"))
@@ -432,7 +432,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return working code to add constraint to check" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfWithCategoricalColumn(session, 10,
         Seq("'_[a_[]}!@'", "_b%%__"))
@@ -569,7 +569,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return evaluable constraint candidates" in
-      withSparkSession { session =>
+      withSession { session =>
 
        val dfWithColumnCandidate = getDfWithCategoricalColumn(session, 10,
         Seq("'_[a_[]}!@'", "_b%%__"))
@@ -598,7 +598,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
 
     "return evaluable constraint candidates even " +
       "if category names contain potentially problematic characters" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfWithCategoricalColumn(session, 10,
         Seq("'_[a_[]}!@'", "_b%%__"))
@@ -627,7 +627,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return working code to add constraint to check" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfWithCategoricalColumn(session, 10,
         Seq("'_[a_[]}!@'", "_b%%__"))
@@ -686,7 +686,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return evaluable constraint candidates" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 
@@ -706,7 +706,7 @@ class ConstraintRulesTest extends WordSpec with FixtureSupport with SparkContext
     }
 
     "return working code to add constraint to check" in
-      withSparkSession { session =>
+      withSession { session =>
 
       val dfWithColumnCandidate = getDfFull(session)
 

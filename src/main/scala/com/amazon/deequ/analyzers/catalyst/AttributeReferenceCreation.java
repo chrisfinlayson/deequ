@@ -20,10 +20,10 @@ import org.apache.spark.sql.catalyst.expressions.AttributeReference;
 import org.apache.spark.sql.catalyst.expressions.AttributeReference$;
 import org.apache.spark.sql.catalyst.expressions.ExprId;
 import org.apache.spark.sql.catalyst.expressions.NamedExpression$;
-import org.apache.spark.sql.types.LongType;
-import org.apache.spark.sql.types.LongType$;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.Metadata$;
+import com.snowflake.snowpark.types.LongType;
+import com.snowflake.snowpark.types.LongType$;
+import com.snowflake.snowpark.types.Metadata;
+import com.snowflake.snowpark.types.Metadata$;
 
 import java.lang.reflect.Method;
 import scala.collection.Seq;

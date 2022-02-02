@@ -19,7 +19,8 @@ package com.amazon.deequ.analyzers.runners
 import com.amazon.deequ.analyzers.Analyzer
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{DataFrame,Session}
+//import com.snowflake.snowpark.{Dataframe, Session}
 
 /** A class to build an AnalysisRun using a fluent API */
 class AnalysisRunBuilder(val data: DataFrame) {
@@ -32,7 +33,7 @@ class AnalysisRunBuilder(val data: DataFrame) {
   protected var failIfResultsForReusingMissing: Boolean = false
   protected var saveOrAppendResultsKey: Option[ResultKey] = None
 
-  protected var sparkSession: Option[SparkSession] = None
+  protected var Session: Option[Session] = None
   protected var saveSuccessMetricsJsonPath: Option[String] = None
   protected var overwriteOutputFiles: Boolean = false
 
@@ -48,7 +49,7 @@ class AnalysisRunBuilder(val data: DataFrame) {
     failIfResultsForReusingMissing = analysisRunBuilder.failIfResultsForReusingMissing
     saveOrAppendResultsKey = analysisRunBuilder.saveOrAppendResultsKey
 
-    sparkSession = analysisRunBuilder.sparkSession
+    Session = analysisRunBuilder.Session
     overwriteOutputFiles = analysisRunBuilder.overwriteOutputFiles
     saveSuccessMetricsJsonPath = analysisRunBuilder.saveSuccessMetricsJsonPath
   }
@@ -86,15 +87,15 @@ class AnalysisRunBuilder(val data: DataFrame) {
   }
 
   /**
-    * Use a sparkSession to conveniently create output files
+    * Use a Session to conveniently create output files
     *
-    * @param sparkSession The SparkSession
+    * @param Session The Session
     */
-  def useSparkSession(
-      sparkSession: SparkSession)
-    : AnalysisRunBuilderWithSparkSession = {
+  def useSession(
+      Session: Session)
+    : AnalysisRunBuilderWithSession = {
 
-    new AnalysisRunBuilderWithSparkSession(this, Option(sparkSession))
+    new AnalysisRunBuilderWithSession(this, Option(Session))
   }
 
   def run(): AnalyzerContext = {
@@ -108,7 +109,7 @@ class AnalysisRunBuilder(val data: DataFrame) {
         saveOrAppendResultsKey
       ),
       fileOutputOptions = AnalysisRunnerFileOutputOptions(
-        sparkSession,
+        Session,
         saveSuccessMetricsJsonPath,
         overwriteOutputFiles
       )
@@ -152,12 +153,12 @@ class AnalysisRunBuilderWithRepository(
   }
 }
 
-class AnalysisRunBuilderWithSparkSession(
+class AnalysisRunBuilderWithSession(
     analysisRunBuilder: AnalysisRunBuilder,
-    usingSparkSession: Option[SparkSession])
+    usingSession: Option[Session])
   extends AnalysisRunBuilder(analysisRunBuilder) {
 
-  sparkSession = usingSparkSession
+  Session = usingSession
 
   /**
     * Save the success metrics json to e.g. S3

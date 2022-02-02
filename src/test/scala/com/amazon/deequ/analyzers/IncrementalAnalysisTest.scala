@@ -19,16 +19,16 @@ package com.amazon.deequ.analyzers
 import com.amazon.deequ.SparkContextSpec
 import com.amazon.deequ.analyzers.runners.AnalysisRunner
 import com.amazon.deequ.utils.FixtureSupport
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import org.scalatest.matchers.should.Matchers
-import org.apache.spark.sql.functions.col
+import com.snowflake.snowpark.functions.col
 import org.scalatest.wordspec.AnyWordSpec
 
 class IncrementalAnalysisTest extends AnyWordSpec with Matchers with SparkContextSpec
   with FixtureSupport {
 
   "An IncrementalAnalysisRunner" should {
-    "produce the same results as a non-incremental analysis" in withSparkSession { session =>
+    "produce the same results as a non-incremental analysis" in withSession { session =>
 
       val initial = initialData(session)
       val delta = deltaData(session)
@@ -60,7 +60,7 @@ class IncrementalAnalysisTest extends AnyWordSpec with Matchers with SparkContex
     }
 
     "produce correct results when sharing scans for aggregation functions" in
-      withSparkSession { session =>
+      withSession { session =>
 
         val initial = initialData(session)
         val delta = deltaData(session)
@@ -87,7 +87,7 @@ class IncrementalAnalysisTest extends AnyWordSpec with Matchers with SparkContex
       }
 
     "produce correct results when sharing scans for histogram-based metrics" in
-      withSparkSession { session =>
+      withSession { session =>
 
         val initial = initialData(session)
         val delta = deltaData(session)
@@ -108,7 +108,7 @@ class IncrementalAnalysisTest extends AnyWordSpec with Matchers with SparkContex
 
   }
 
-  def initialData(session: SparkSession): DataFrame = {
+  def initialData(session: Session): DataFrame = {
     import session.implicits._
     Seq(
       (1, "B00BJXTG66", "2nd story llc-0-$ims_facets-0-", "extended"),
@@ -134,7 +134,7 @@ class IncrementalAnalysisTest extends AnyWordSpec with Matchers with SparkContex
       .toDF("marketplace_id", "item", "attribute", "value")
   }
 
-  def deltaData(session: SparkSession): DataFrame = {
+  def deltaData(session: Session): DataFrame = {
     import session.implicits._
     Seq(
       (1, "B008FZTBAW", "BroadITKitem_type_keyword-0-", "jewelry-products"),

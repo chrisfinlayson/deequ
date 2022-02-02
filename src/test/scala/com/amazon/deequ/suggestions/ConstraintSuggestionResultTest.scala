@@ -20,7 +20,7 @@ import com.amazon.deequ.SparkContextSpec
 import com.amazon.deequ.suggestions.rules.UniqueIfApproximatelyUniqueRule
 import com.amazon.deequ.utils.FixtureSupport
 import com.google.gson.JsonParser
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.Session
 import org.scalatest.{Matchers, WordSpec}
 
 class ConstraintSuggestionResultTest extends WordSpec with Matchers with SparkContextSpec
@@ -30,7 +30,7 @@ class ConstraintSuggestionResultTest extends WordSpec with Matchers with SparkCo
 
       // TODO Disabled for now as we get different results for Spark 2.2 and 2.3
 //    "return Json that is formatted as expected for getColumnProfilesAsJson" in
-//      withSparkSession { session =>
+//      withSession { session =>
 //
 //        evaluate(session) { results =>
 //
@@ -200,7 +200,7 @@ class ConstraintSuggestionResultTest extends WordSpec with Matchers with SparkCo
 //      }
 
     "return Json that is formatted as expected for getConstraintSuggestionsAsJson" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluate(session) { results =>
 
@@ -283,7 +283,7 @@ class ConstraintSuggestionResultTest extends WordSpec with Matchers with SparkCo
       }
 
     "return Json that is formatted as expected for getEvaluationResultsAsJson" in
-      withSparkSession { session =>
+      withSession { session =>
 
         evaluateWithTrainTestSplit(session) { results =>
 
@@ -371,7 +371,7 @@ class ConstraintSuggestionResultTest extends WordSpec with Matchers with SparkCo
       }
 
     "return Json that is formatted as expected for getEvaluationResultsAsJson without" +
-      " train/test-split" in withSparkSession { session =>
+      " train/test-split" in withSession { session =>
         evaluate(session) { results =>
 
           val evaluationResultsJson = ConstraintSuggestionResult.getEvaluationResultsAsJson(results)
@@ -458,7 +458,7 @@ class ConstraintSuggestionResultTest extends WordSpec with Matchers with SparkCo
       }
   }
 
-  private[this] def evaluate(session: SparkSession)(test: ConstraintSuggestionResult => Unit)
+  private[this] def evaluate(session: Session)(test: ConstraintSuggestionResult => Unit)
     : Unit = {
 
     val data = getDfFull(session)
@@ -472,7 +472,7 @@ class ConstraintSuggestionResultTest extends WordSpec with Matchers with SparkCo
     test(results)
   }
 
-  private[this] def evaluateWithTrainTestSplit(session: SparkSession)(
+  private[this] def evaluateWithTrainTestSplit(session: Session)(
       test: ConstraintSuggestionResult => Unit)
     : Unit = {
 

@@ -23,8 +23,8 @@ import com.amazon.deequ.checks.{Check, CheckStatus}
 import com.amazon.deequ.io.DfsUtils
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.types.StructType
+import com.snowflake.snowpark.{Dataframe, Session}
 
 private[deequ] case class VerificationMetricsRepositoryOptions(
       metricsRepository: Option[MetricsRepository] = None,
@@ -33,7 +33,7 @@ private[deequ] case class VerificationMetricsRepositoryOptions(
       saveOrAppendResultsWithKey: Option[ResultKey] = None)
 
 private[deequ] case class VerificationFileOutputOptions(
-      sparkSession: Option[SparkSession] = None,
+      Session: Option[Session] = None,
       saveCheckResultsJsonToPath: Option[String] = None,
       saveSuccessMetricsJsonToPath: Option[String] = None,
       overwriteOutputFiles: Boolean = false)
@@ -100,7 +100,7 @@ class VerificationSuite {
     * @param aggregateWith    loader from which we retrieve initial states to aggregate (optional)
     * @param saveStatesWith   persist resulting states for the configured analyzers (optional)
     * @param metricsRepositoryOptions Options related to the MetricsRepository
-    * @param fileOutputOptions Options related to FileOuput using a SparkSession
+    * @param fileOutputOptions Options related to FileOuput using a Session
     * @return Result for every check including the overall status, detailed status for each
     *         constraints and all metrics produced
     */
@@ -148,7 +148,7 @@ class VerificationSuite {
     verificationResult: VerificationResult)
   : Unit = {
 
-    fileOutputOptions.sparkSession.foreach { session =>
+    fileOutputOptions.Session.foreach { session =>
       fileOutputOptions.saveCheckResultsJsonToPath.foreach { profilesOutput =>
 
         DfsUtils.writeToTextFileOnDfs(session, profilesOutput,
@@ -159,7 +159,7 @@ class VerificationSuite {
         }
     }
 
-    fileOutputOptions.sparkSession.foreach { session =>
+    fileOutputOptions.Session.foreach { session =>
       fileOutputOptions.saveSuccessMetricsJsonToPath.foreach { profilesOutput =>
 
         DfsUtils.writeToTextFileOnDfs(session, profilesOutput,
@@ -233,15 +233,15 @@ class VerificationSuite {
     *
     * @param check A check that may be applicable to some data
     * @param schema The schema of the data the checks are for
-    * @param sparkSession The spark session in order to be able to create fake data
+    * @param Session The spark session in order to be able to create fake data
     */
   def isCheckApplicableToData(
       check: Check,
       schema: StructType,
-      sparkSession: SparkSession)
+      Session: Session)
     : CheckApplicability = {
 
-    new Applicability(sparkSession).isApplicable(check, schema)
+    new Applicability(Session).isApplicable(check, schema)
   }
 
   /**
@@ -249,15 +249,15 @@ class VerificationSuite {
     *
     * @param analyzers Analyzers that may be applicable to some data
     * @param schema The schema of the data the analyzers are for
-    * @param sparkSession The spark session in order to be able to create fake data
+    * @param Session The spark session in order to be able to create fake data
     */
   def areAnalyzersApplicableToData(
       analyzers: Seq[Analyzer[_ <: State[_], Metric[_]]],
       schema: StructType,
-      sparkSession: SparkSession)
+      Session: Session)
     : AnalyzersApplicability = {
 
-    new Applicability(sparkSession).isApplicable(analyzers, schema)
+    new Applicability(Session).isApplicable(analyzers, schema)
   }
 
   private[this] def evaluate(

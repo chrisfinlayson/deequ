@@ -21,7 +21,7 @@ import com.amazon.deequ.analyzers.runners.AnalyzerContext
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository.{AnalysisResult, AnalysisResultSerde, MetricsRepository, MetricsRepositoryMultipleResultsLoader, ResultKey}
 import org.apache.hadoop.fs.{FileSystem, Path}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.Session
 import java.util.UUID.randomUUID
 import com.google.common.io.Closeables
 import java.io.{BufferedInputStream, BufferedOutputStream}
@@ -29,7 +29,7 @@ import org.apache.commons.io.IOUtils
 
 
 /** A Repository implementation using a file system */
-class FileSystemMetricsRepository(session: SparkSession, path: String) extends MetricsRepository {
+class FileSystemMetricsRepository(session: Session, path: String) extends MetricsRepository {
 
   /**
     * Saves Analysis results (metrics)
@@ -74,7 +74,7 @@ class FileSystemMetricsRepository(session: SparkSession, path: String) extends M
 }
 
 class FileSystemMetricsRepositoryMultipleResultsLoader(
-  session: SparkSession, path: String) extends MetricsRepositoryMultipleResultsLoader {
+  session: Session, path: String) extends MetricsRepositoryMultipleResultsLoader {
 
   private[this] var tagValues: Option[Map[String, String]] = None
   private[this] var forAnalyzers: Option[Seq[Analyzer[_, Metric[_]]]] = None
@@ -159,13 +159,13 @@ object FileSystemMetricsRepository {
 
   val CHARSET_NAME = "UTF-8"
 
-  def apply(session: SparkSession, path: String): FileSystemMetricsRepository = {
+  def apply(session: Session, path: String): FileSystemMetricsRepository = {
     new FileSystemMetricsRepository(session, path)
   }
 
   /* Helper function to write to a binary file on S3 */
   private[fs] def writeToFileOnDfs(
-      session: SparkSession,
+      session: Session,
       path: String,
       writeFunc: BufferedOutputStream => Unit)
     : Unit = {
@@ -196,7 +196,7 @@ object FileSystemMetricsRepository {
   }
 
   /* Helper function to read from a binary file on S3 */
-  private[fs] def readFromFileOnDfs[T](session: SparkSession, path: String,
+  private[fs] def readFromFileOnDfs[T](session: Session, path: String,
     readFunc: BufferedInputStream => T): Option[T] = {
 
     val (fs, qualifiedPath) = asQualifiedPath(session, path)
@@ -216,7 +216,7 @@ object FileSystemMetricsRepository {
   }
 
   /* Make sure we write to the correct filesystem, as EMR clusters also have an internal HDFS */
-  private[fs] def asQualifiedPath(session: SparkSession, path: String): (FileSystem, Path) = {
+  private[fs] def asQualifiedPath(session: Session, path: String): (FileSystem, Path) = {
     val hdfsPath = new Path(path)
     val fs = hdfsPath.getFileSystem(session.sparkContext.hadoopConfiguration)
     val qualifiedPath = hdfsPath.makeQualified(fs.getUri, fs.getWorkingDirectory)

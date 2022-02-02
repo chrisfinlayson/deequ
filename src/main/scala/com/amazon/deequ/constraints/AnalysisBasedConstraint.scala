@@ -18,7 +18,8 @@ package com.amazon.deequ.constraints
 
 import com.amazon.deequ.analyzers.{Analyzer, State}
 import com.amazon.deequ.metrics.Metric
-import org.apache.spark.sql.DataFrame
+import com.snowflake.snowpark.DataFrame
+import com.snowflake.snowpark.DataFrame
 import scala.util.{Failure, Success, Try}
 
 /**

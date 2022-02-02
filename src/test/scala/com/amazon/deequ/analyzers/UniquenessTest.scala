@@ -20,14 +20,14 @@ import com.amazon.deequ.SparkContextSpec
 import com.amazon.deequ.analyzers.runners.AnalysisRunner
 import com.amazon.deequ.metrics.DoubleMetric
 import com.amazon.deequ.utils.FixtureSupport
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class UniquenessTest extends AnyWordSpec with Matchers with SparkContextSpec with FixtureSupport {
 
-  def uniquenessSampleData(sparkSession: SparkSession): DataFrame = {
-    import sparkSession.implicits._
+  def uniquenessSampleData(Session: Session): DataFrame = {
+    import Session.implicits._
 
     // Example from https://github.com/awslabs/deequ/issues/178
     Seq(
@@ -45,7 +45,7 @@ class UniquenessTest extends AnyWordSpec with Matchers with SparkContextSpec wit
 
   "Uniqueness" should {
 
-    "be correct for multiple fields" in withSparkSession { session =>
+    "be correct for multiple fields" in withSession { session =>
 
       val data = uniquenessSampleData(session)
 
@@ -63,8 +63,8 @@ class UniquenessTest extends AnyWordSpec with Matchers with SparkContextSpec wit
     }
   }
 
-  "Filtered Uniqueness" in withSparkSession { sparkSession =>
-    import sparkSession.implicits._
+  "Filtered Uniqueness" in withSession { Session =>
+    import Session.implicits._
     val df = Seq(
       ("1", "unique"),
       ("2", "unique"),

@@ -20,9 +20,12 @@ import com.amazon.deequ.analyzers._
 import com.amazon.deequ.io.DfsUtils
 import com.amazon.deequ.metrics.{DoubleMetric, Metric}
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.storage.StorageLevel
+//import com.snowflake.snowpark.types.StructType
+import com.snowflake.snowpark.{DataFrame,Row,Session}
+import com.snowflake.snowpark.types.StructType
+
+//import com.snowflake.snowpark.{DataFrame,Row,Session}
+//import org.apache.spark.storage.StorageLevel
 import scala.util.Success
 
 private[deequ] case class AnalysisRunnerRepositoryOptions(
@@ -32,7 +35,7 @@ private[deequ] case class AnalysisRunnerRepositoryOptions(
       saveOrAppendResultsWithKey: Option[ResultKey] = None)
 
 private[deequ] case class AnalysisRunnerFileOutputOptions(
-      sparkSession: Option[SparkSession] = None,
+      Session: Option[Session] = None,
       saveSuccessMetricsJsonToPath: Option[String] = None,
       overwriteOutputFiles: Boolean = false)
 
@@ -91,7 +94,7 @@ object AnalysisRunner {
     *                                                   StorageLevel.NONE to completely disable
     *                                                   caching)
     * @param metricsRepositoryOptions Options related to the MetricsRepository
-    * @param fileOutputOptions Options related to FileOuput using a SparkSession
+    * @param fileOutputOptions Options related to FileOuput using a Session
     * @return AnalyzerContext holding the requested metrics per analyzer
     */
   private[deequ] def doAnalysisRun(
@@ -99,7 +102,7 @@ object AnalysisRunner {
       analyzers: Seq[Analyzer[_, Metric[_]]],
       aggregateWith: Option[StateLoader] = None,
       saveStatesWith: Option[StatePersister] = None,
-      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK,
+//      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK,
       metricsRepositoryOptions: AnalysisRunnerRepositoryOptions =
         AnalysisRunnerRepositoryOptions(),
       fileOutputOptions: AnalysisRunnerFileOutputOptions =
@@ -238,7 +241,7 @@ object AnalysisRunner {
     analyzerContext: AnalyzerContext)
   : Unit = {
 
-    fileOutputOptions.sparkSession.foreach { session =>
+    fileOutputOptions.Session.foreach { session =>
       fileOutputOptions.saveSuccessMetricsJsonToPath.foreach { profilesOutput =>
 
         DfsUtils.writeToTextFileOnDfs(session, profilesOutput,

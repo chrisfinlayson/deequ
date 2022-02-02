@@ -16,12 +16,12 @@
 
 package com.amazon.deequ.examples
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 
 private[deequ] object ExampleUtils {
 
-  def withSpark(func: SparkSession => Unit): Unit = {
-    val session = SparkSession.builder()
+  def withSpark(func: Session => Unit): Unit = {
+    val session = Session.builder()
       .master("local")
       .appName("test")
       .config("spark.ui.enabled", "false")
@@ -36,12 +36,12 @@ private[deequ] object ExampleUtils {
     }
   }
 
-  def itemsAsDataframe(session: SparkSession, items: Item*): DataFrame = {
+  def itemsAsDataframe(session: Session, items: Item*): DataFrame = {
     val rdd = session.sparkContext.parallelize(items)
     session.createDataFrame(rdd)
   }
 
-  def manufacturersAsDataframe(session: SparkSession, manufacturers: Manufacturer*): DataFrame = {
+  def manufacturersAsDataframe(session: Session, manufacturers: Manufacturer*): DataFrame = {
     val rdd = session.sparkContext.parallelize(manufacturers)
     session.createDataFrame(rdd)
   }

@@ -26,7 +26,7 @@ import com.amazon.deequ.repository.ResultKey
 import com.amazon.deequ.repository.memory.InMemoryMetricsRepository
 import com.amazon.deequ.suggestions.rules.UniqueIfApproximatelyUniqueRule
 import com.amazon.deequ.utils.{FixtureSupport, TempFileUtils}
-import org.apache.spark.sql.DataFrame
+import com.snowflake.snowpark.DataFrame
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.util.Try
@@ -39,9 +39,9 @@ class ConstraintSuggestionRunnerTest extends WordSpec with Matchers with SparkCo
   "Constraint Suggestion Suite" should {
 
     "save and reuse existing results for constraint suggestion runs" in
-      withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      withMonitorableSession { (Session, sparkMonitor) =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -84,9 +84,9 @@ class ConstraintSuggestionRunnerTest extends WordSpec with Matchers with SparkCo
       }
 
     "save results if specified so they can be reused by other runners" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -109,9 +109,9 @@ class ConstraintSuggestionRunnerTest extends WordSpec with Matchers with SparkCo
       }
 
     "only append results to repository without unnecessarily overwriting existing ones" in
-      withSparkSession { sparkSession =>
+      withSession { Session =>
 
-        val df = getDfWithNumericValues(sparkSession)
+        val df = getDfWithNumericValues(Session)
 
         val repository = new InMemoryMetricsRepository
         val resultKey = ResultKey(0, Map.empty)
@@ -137,9 +137,9 @@ class ConstraintSuggestionRunnerTest extends WordSpec with Matchers with SparkCo
       }
 
     "if there are previous results in the repository new results should pre preferred in case of " +
-      "conflicts" in withSparkSession { sparkSession =>
+      "conflicts" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val repository = new InMemoryMetricsRepository
       val resultKey = ResultKey(0, Map.empty)
@@ -168,9 +168,9 @@ class ConstraintSuggestionRunnerTest extends WordSpec with Matchers with SparkCo
           .subsetOf(repository.loadByKey(resultKey).get.metricMap.toSet))
     }
 
-    "should write output files to specified locations" in withSparkSession { sparkSession =>
+    "should write output files to specified locations" in withSession { Session =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       val tempDir = TempFileUtils.tempDir("constraintSuggestionOuput")
       val columnProfilesPath = tempDir + "/column-profiles.json"
@@ -179,28 +179,28 @@ class ConstraintSuggestionRunnerTest extends WordSpec with Matchers with SparkCo
 
       ConstraintSuggestionRunner().onData(df)
         .addConstraintRules(Rules.DEFAULT)
-        .useSparkSession(sparkSession)
+        .useSession(Session)
         .saveColumnProfilesJsonToPath(columnProfilesPath)
         .saveConstraintSuggestionsJsonToPath(constraintSuggestionsPath)
         .useTrainTestSplitWithTestsetRatio(0.1, Some(0))
         .saveEvaluationResultsJsonToPath(evaluationResultsPath)
         .run()
 
-      DfsUtils.readFromFileOnDfs(sparkSession, columnProfilesPath) {
+      DfsUtils.readFromFileOnDfs(Session, columnProfilesPath) {
         inputStream => assert(inputStream.read() > 0)
       }
-      DfsUtils.readFromFileOnDfs(sparkSession, constraintSuggestionsPath) {
+      DfsUtils.readFromFileOnDfs(Session, constraintSuggestionsPath) {
         inputStream => assert(inputStream.read() > 0)
       }
-      DfsUtils.readFromFileOnDfs(sparkSession, evaluationResultsPath) {
+      DfsUtils.readFromFileOnDfs(Session, evaluationResultsPath) {
         inputStream => assert(inputStream.read() > 0)
       }
     }
 
     "fail if specified when the calculation of new metrics would be needed when " +
-      "reusing previous results" in withMonitorableSparkSession { (sparkSession, sparkMonitor) =>
+      "reusing previous results" in withMonitorableSession { (Session, sparkMonitor) =>
 
-      val df = getDfWithNumericValues(sparkSession)
+      val df = getDfWithNumericValues(Session)
 
       intercept[ReusingNotPossibleResultsMissingException](
         ConstraintSuggestionRunner()
@@ -212,7 +212,7 @@ class ConstraintSuggestionRunnerTest extends WordSpec with Matchers with SparkCo
       )
     }
 
-    "suggest retain type rule with completeness information" in withSparkSession { session =>
+    "suggest retain type rule with completeness information" in withSession { session =>
 
       import ConstraintSuggestionRunnerTest.Item
 

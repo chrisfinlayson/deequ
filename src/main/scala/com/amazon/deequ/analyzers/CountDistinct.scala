@@ -17,8 +17,9 @@
 package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.metrics.DoubleMetric
-import org.apache.spark.sql.{Column, Row}
-import org.apache.spark.sql.functions.count
+import com.snowflake.snowpark.{Column, Row}
+import com.snowflake.snowpark.functions.count
+//import com.snowflake.snowpark.functions.count
 import Analyzers._
 
 case class CountDistinct(columns: Seq[String])

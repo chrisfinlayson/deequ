@@ -19,7 +19,7 @@ package com.amazon.deequ.analyzers.runners
 import com.amazon.deequ.analyzers.{Analyzer, FilterableAnalyzer}
 import com.amazon.deequ.metrics.{DoubleMetric, Metric}
 import com.amazon.deequ.repository.SimpleResultSerde
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 
 /**
   * The result returned from AnalysisRunner and Analysis
@@ -46,14 +46,14 @@ object AnalyzerContext {
   def empty: AnalyzerContext = AnalyzerContext(Map.empty)
 
   def successMetricsAsDataFrame(
-      sparkSession: SparkSession,
+      Session: Session,
       analyzerContext: AnalyzerContext,
       forAnalyzers: Seq[Analyzer[_, Metric[_]]] = Seq.empty)
     : DataFrame = {
 
     val metricsList = getSimplifiedMetricOutputForSelectedAnalyzers(analyzerContext, forAnalyzers)
 
-    import sparkSession.implicits._
+    import Session.implicits._
 
     metricsList.toDF("entity", "instance", "name", "value")
   }

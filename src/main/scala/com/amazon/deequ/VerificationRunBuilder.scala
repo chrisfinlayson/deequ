@@ -22,7 +22,7 @@ import com.amazon.deequ.analyzers.{State, _}
 import com.amazon.deequ.checks.{Check, CheckLevel}
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository._
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import com.snowflake.snowpark.{Dataframe, Session}
 
 /** A class to build a VerificationRun using a fluent API */
 class VerificationRunBuilder(val data: DataFrame) {
@@ -37,7 +37,7 @@ class VerificationRunBuilder(val data: DataFrame) {
   protected var failIfResultsForReusingMissing: Boolean = false
   protected var saveOrAppendResultsKey: Option[ResultKey] = None
 
-  protected var sparkSession: Option[SparkSession] = None
+  protected var Session: Option[Session] = None
   protected var saveCheckResultsJsonPath: Option[String] = None
   protected var saveSuccessMetricsJsonPath: Option[String] = None
   protected var overwriteOutputFiles: Boolean = false
@@ -59,7 +59,7 @@ class VerificationRunBuilder(val data: DataFrame) {
     failIfResultsForReusingMissing = verificationRunBuilder.failIfResultsForReusingMissing
     saveOrAppendResultsKey = verificationRunBuilder.saveOrAppendResultsKey
 
-    sparkSession = verificationRunBuilder.sparkSession
+    Session = verificationRunBuilder.Session
     overwriteOutputFiles = verificationRunBuilder.overwriteOutputFiles
     saveCheckResultsJsonPath = verificationRunBuilder.saveCheckResultsJsonPath
     saveSuccessMetricsJsonPath = verificationRunBuilder.saveSuccessMetricsJsonPath
@@ -148,15 +148,15 @@ class VerificationRunBuilder(val data: DataFrame) {
   }
 
   /**
-    * Use a sparkSession to conveniently create output files
+    * Use a Session to conveniently create output files
     *
-    * @param sparkSession The SparkSession
+    * @param Session The Session
     */
-  def useSparkSession(
-      sparkSession: SparkSession)
-    : VerificationRunBuilderWithSparkSession = {
+  def useSession(
+      Session: Session)
+    : VerificationRunBuilderWithSession = {
 
-    new VerificationRunBuilderWithSparkSession(this, Option(sparkSession))
+    new VerificationRunBuilderWithSession(this, Option(Session))
   }
 
 
@@ -171,7 +171,7 @@ class VerificationRunBuilder(val data: DataFrame) {
         failIfResultsForReusingMissing,
         saveOrAppendResultsKey),
       fileOutputOptions = VerificationFileOutputOptions(
-        sparkSession,
+        Session,
         saveCheckResultsJsonPath,
         saveSuccessMetricsJsonPath,
         overwriteOutputFiles),
@@ -243,12 +243,12 @@ class VerificationRunBuilderWithRepository(
   }
 }
 
-class VerificationRunBuilderWithSparkSession(
+class VerificationRunBuilderWithSession(
     verificationRunBuilder: VerificationRunBuilder,
-    usingSparkSession: Option[SparkSession])
+    usingSession: Option[Session])
   extends VerificationRunBuilder(verificationRunBuilder) {
 
-  sparkSession = usingSparkSession
+  Session = usingSession
 
   /**
     * Save the check results json to e.g. S3

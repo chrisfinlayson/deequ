@@ -17,8 +17,8 @@
 package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.Analyzers.COUNT_COL
-import org.apache.spark.sql.functions.{col, sum}
-import org.apache.spark.sql.types.DoubleType
+import com.snowflake.snowpark.functions.{col, sum}
+import com.snowflake.snowpark.types.DoubleType
 import org.apache.spark.sql.Column
 
 /**

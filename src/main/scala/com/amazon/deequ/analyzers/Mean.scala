@@ -17,9 +17,9 @@
 package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isNumeric}
-import org.apache.spark.sql.{Column, Row}
-import org.apache.spark.sql.functions.{count, sum}
-import org.apache.spark.sql.types.{DoubleType, StructType, LongType}
+import com.snowflake.snowpark.{Column, Row}
+import com.snowflake.snowpark.functions.{count, sum}
+import com.snowflake.snowpark.types.{DoubleType, StructType, LongType}
 import Analyzers._
 
 case class MeanState(sum: Double, count: Long) extends DoubleValuedState[MeanState] {

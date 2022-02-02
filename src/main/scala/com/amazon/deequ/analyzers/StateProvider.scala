@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 import com.google.common.io.Closeables
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileSystem, Path}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.Session
 import org.apache.spark.sql.catalyst.expressions.aggregate.{ApproximatePercentile, DeequHyperLogLogPlusPlusUtils}
 import org.apache.spark.sql.SaveMode
 
@@ -71,7 +71,7 @@ case class InMemoryStateProvider() extends StateLoader with StatePersister {
 
 /** Store states on a filesystem (supports local disk, HDFS, S3) */
 case class HdfsStateProvider(
-    session: SparkSession,
+    session: Session,
     locationPrefix: String,
     numPartitionsForHistogram: Int = 10,
     allowOverwrite: Boolean = false)

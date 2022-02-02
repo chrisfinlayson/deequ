@@ -17,9 +17,9 @@
 package com.amazon.deequ.analyzers
 
 import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isNumeric}
-import org.apache.spark.sql.functions.sum
-import org.apache.spark.sql.types.{DoubleType, StructType}
-import org.apache.spark.sql.{Column, Row}
+import com.snowflake.snowpark.functions.sum
+import com.snowflake.snowpark.types.{DoubleType, StructType}
+import com.snowflake.snowpark.{Column, Row}
 import Analyzers._
 
 case class SumState(sum: Double) extends DoubleValuedState[SumState] {
