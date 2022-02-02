@@ -107,7 +107,7 @@ object ColumnProfiler {
     // Ensure that all desired columns exist
     restrictToColumns.foreach { restrictToColumns =>
       restrictToColumns.foreach { columnName =>
-        require(data.schema.fieldNames.contains(columnName), s"Unable to find column $columnName")
+        require(data.schema.fields.contains(columnName), s"Unable to find column $columnName")
       }
     }
 
@@ -368,7 +368,7 @@ object ColumnProfiler {
 
     data.withColumn(s"${name}___CASTED", data(name).cast(toType))
       .drop(name)
-      .withColumnRenamed(s"${name}___CASTED", name)
+      .withColumn(s"${name}___CASTED", name)
   }
 
   private[this] def extractGenericStatistics(
@@ -593,7 +593,7 @@ object ColumnProfiler {
         targetColumns.map { column =>
 
           val index = namesToIndexes(column)
-          val valueInColumn = if (row.isNullAt(index)) {
+          val valueInColumn = if (row.is_nullAt(index)) {
             Histogram.NullFieldReplacement
           } else {
             row.get(index).toString

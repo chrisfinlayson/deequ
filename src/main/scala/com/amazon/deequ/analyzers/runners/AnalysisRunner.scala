@@ -20,12 +20,10 @@ import com.amazon.deequ.analyzers._
 import com.amazon.deequ.io.DfsUtils
 import com.amazon.deequ.metrics.{DoubleMetric, Metric}
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
-//import com.snowflake.snowpark.types.StructType
+
 import com.snowflake.snowpark.{DataFrame,Row,Session}
 import com.snowflake.snowpark.types.StructType
 
-//import com.snowflake.snowpark.{DataFrame,Row,Session}
-//import org.apache.spark.storage.StorageLevel
 import scala.util.Success
 
 private[deequ] case class AnalysisRunnerRepositoryOptions(
@@ -73,12 +71,12 @@ object AnalysisRunner {
       data: DataFrame,
       analysis: Analysis,
       aggregateWith: Option[StateLoader] = None,
-      saveStatesWith: Option[StatePersister] = None,
-      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK)
+      saveStatesWith: Option[StatePersister] = None
+//      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK)
     : AnalyzerContext = {
 
     doAnalysisRun(data, analysis.analyzers, aggregateWith, saveStatesWith,
-      storageLevelOfGroupedDataForMultiplePasses)
+      )
   }
 
   /**
@@ -89,10 +87,6 @@ object AnalysisRunner {
     * @param aggregateWith load existing states for the configured analyzers and aggregate them
     *                      (optional)
     * @param saveStatesWith persist resulting states for the configured analyzers (optional)
-    * @param storageLevelOfGroupedDataForMultiplePasses caching level for grouped data that must be
-    *                                                   accessed multiple times (use
-    *                                                   StorageLevel.NONE to completely disable
-    *                                                   caching)
     * @param metricsRepositoryOptions Options related to the MetricsRepository
     * @param fileOutputOptions Options related to FileOuput using a Session
     * @return AnalyzerContext holding the requested metrics per analyzer
@@ -158,12 +152,12 @@ object AnalysisRunner {
     val (kllAnalyzers, scanningAnalyzers) =
       allScanningAnalyzers.partition { _.isInstanceOf[KLLSketch] }
 
-    val kllMetrics =
-      if (kllAnalyzers.nonEmpty) {
-        KLLRunner.computeKLLSketchesInExtraPass(data, kllAnalyzers, aggregateWith, saveStatesWith)
-      } else {
-        AnalyzerContext.empty
-      }
+//    val kllMetrics =
+//      if (kllAnalyzers.nonEmpty) {
+//        KLLRunner.computeKLLSketchesInExtraPass(data, kllAnalyzers, aggregateWith, saveStatesWith)
+//      } else {
+//        AnalyzerContext.empty
+//      }
 
     /* Run the analyzers which do not require grouping in a single pass over the data */
     val nonGroupedMetrics =
@@ -185,7 +179,8 @@ object AnalysisRunner {
 
         val (numRows, metrics) =
           runGroupingAnalyzers(data, groupingColumns, filterCondition, analyzersForGrouping,
-            aggregateWith, saveStatesWith, storageLevelOfGroupedDataForMultiplePasses,
+            aggregateWith, saveStatesWith
+//            , storageLevelOfGroupedDataForMultiplePasses,
             numRowsOfData)
 
         groupedMetrics = groupedMetrics ++ metrics
@@ -197,7 +192,7 @@ object AnalysisRunner {
       }
 
     val resultingAnalyzerContext = resultsComputedPreviously ++ preconditionFailures ++
-      nonGroupedMetrics ++ groupedMetrics ++ kllMetrics
+      nonGroupedMetrics ++ groupedMetrics //++ kllMetrics
 
     saveOrAppendResultsIfNecessary(
       resultingAnalyzerContext,
@@ -277,7 +272,7 @@ object AnalysisRunner {
       analyzers: Seq[GroupingAnalyzer[State[_], Metric[_]]],
       aggregateWith: Option[StateLoader],
       saveStatesTo: Option[StatePersister],
-      storageLevelOfGroupedDataForMultiplePasses: StorageLevel,
+//      storageLevelOfGroupedDataForMultiplePasses: StorageLevel,
       numRowsOfData: Option[Long])
     : (Long, AnalyzerContext) = {
 
@@ -403,7 +398,7 @@ object AnalysisRunner {
       analysis: Analysis,
       stateLoaders: Seq[StateLoader],
       saveStatesWith: Option[StatePersister] = None,
-      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK,
+//      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK,
       metricsRepository: Option[MetricsRepository] = None,
       saveOrAppendResultsWithKey: Option[ResultKey] = None                             )
     : AnalyzerContext = {
@@ -496,8 +491,9 @@ object AnalysisRunner {
   private[this] def runAnalyzersForParticularGrouping(
       frequenciesAndNumRows: FrequenciesAndNumRows,
       analyzers: Seq[GroupingAnalyzer[State[_], Metric[_]]],
-      saveStatesTo: Option[StatePersister] = None,
-      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK)
+      saveStatesTo: Option[StatePersister] = None
+//      ,
+//      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK)
     : AnalyzerContext = {
 
     val numRows = frequenciesAndNumRows.numRows

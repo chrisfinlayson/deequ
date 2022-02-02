@@ -254,7 +254,7 @@ abstract class PredicateMatchingAnalyzer(
 
   override def fromAggregationResult(result: Row, offset: Int): Option[NumMatchesAndCount] = {
 
-    if (result.isNullAt(offset) || result.isNullAt(offset + 1)) {
+    if (result.is_nullAt(offset) || result.is_nullAt(offset + 1)) {
       None
     } else {
       val state = NumMatchesAndCount(result.getLong(offset), result.getLong(offset + 1))
@@ -431,7 +431,7 @@ private[deequ] object Analyzers {
       (func: Unit => S)
     : Option[S] = {
 
-    val nullInResult = (offset until offset + howMany).exists { index => result.isNullAt(index) }
+    val nullInResult = (offset until offset + howMany).exists { index => result.is_nullAt(index) }
 
     if (nullInResult) {
       None

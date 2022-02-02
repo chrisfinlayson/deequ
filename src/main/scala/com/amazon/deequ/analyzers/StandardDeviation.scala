@@ -54,7 +54,7 @@ case class StandardDeviation(column: String, where: Option[String] = None)
 
   override def fromAggregationResult(result: Row, offset: Int): Option[StandardDeviationState] = {
 
-    if (result.isNullAt(offset)) {
+    if (result.is_nullAt(offset)) {
       None
     } else {
       val row = result.getAs[Row](offset)

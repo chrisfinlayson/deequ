@@ -53,8 +53,9 @@ case class Analysis(analyzers: Seq[Analyzer[_, Metric[_]]] = Seq.empty) {
   def run(
       data: DataFrame,
       aggregateWith: Option[StateLoader] = None,
-      saveStatesWith: Option[StatePersister] = None,
-      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK)
+      saveStatesWith: Option[StatePersister] = None
+//      ,
+//      storageLevelOfGroupedDataForMultiplePasses: StorageLevel = StorageLevel.MEMORY_AND_DISK)
     : AnalyzerContext = {
 
     AnalysisRunner.doAnalysisRun(data, analyzers, aggregateWith = aggregateWith,

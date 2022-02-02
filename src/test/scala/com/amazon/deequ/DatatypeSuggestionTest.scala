@@ -18,7 +18,7 @@ package com.amazon.deequ
 
 import com.amazon.deequ.profiles.{ColumnProfiler, ColumnProfiles, StandardColumnProfile}
 import com.amazon.deequ.utils.FixtureSupport
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 

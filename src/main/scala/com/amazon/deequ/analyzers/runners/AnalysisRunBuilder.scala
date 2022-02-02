@@ -20,7 +20,6 @@ import com.amazon.deequ.analyzers.Analyzer
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
 import com.snowflake.snowpark.{DataFrame,Session}
-//import com.snowflake.snowpark.{Dataframe, Session}
 
 /** A class to build an AnalysisRun using a fluent API */
 class AnalysisRunBuilder(val data: DataFrame) {

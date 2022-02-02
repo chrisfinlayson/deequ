@@ -16,14 +16,15 @@
 
 package com.amazon.deequ.analyzers
 
-import org.apache.spark.sql.{Column, DataFrame, Row}
-import com.snowflake.snowpark.functions.{coalesce, col, count, expr, lit}
+import com.snowflake.snowpark.{Column, DataFrame, Row}
+import com.snowflake.snowpark.functions.{coalesce, col, count, lit}
 import Analyzers.COUNT_COL
 import com.amazon.deequ.metrics.DoubleMetric
 import Analyzers._
 import com.snowflake.snowpark.types.StructType
 import Preconditions._
 import com.amazon.deequ.analyzers.runners.MetricCalculationException
+import com.snowflake.snowpark.Column.expr
 
 /** Base class for all analyzers that operate the frequencies of groups in the data */
 abstract class FrequencyBasedAnalyzer(columnsToGroupOn: Seq[String])
@@ -62,7 +63,7 @@ object FrequencyBasedAnalyzer {
 
     val atLeastOneNonNullGroupingColumn = groupingColumns
       .foldLeft(expr(false.toString)) { case (condition, name) =>
-        condition.or(col(name).isNotNull)
+        condition.or(col(name).is_not_null)
       }
 
     val frequencies = data
@@ -121,7 +122,7 @@ abstract class ScanShareableFrequencyBasedAnalyzer(name: String, columnsToGroupO
   }
 
   def fromAggregationResult(result: Row, offset: Int): DoubleMetric = {
-    if (result.isNullAt(offset)) {
+    if (result.is_nullAt(offset)) {
       metricFromEmpty(this, name, columnsToGroupOn.mkString(","), entityFrom(columnsToGroupOn))
     } else {
       toSuccessMetric(result.getDouble(offset))

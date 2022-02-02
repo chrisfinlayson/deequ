@@ -18,6 +18,7 @@ package org.apache.spark.sql
 
 
 import com.amazon.deequ.analyzers.KLLSketch
+import com.snowflake.snowpark.Column
 import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateFunction, StatefulApproxQuantile, StatefulHyperloglogPlus}
 import org.apache.spark.sql.catalyst.expressions.Literal
 
@@ -56,38 +57,38 @@ object DeequFunctions {
     stateful_approx_count_distinct(Column(column))
   }
 
-  /** Approximate number of distinct values with state via HLL's */
-  def stateful_approx_count_distinct(column: Column): Column = withAggregateFunction {
-    StatefulHyperloglogPlus(column.expr)
-  }
+//  /** Approximate number of distinct values with state via HLL's */
+//  def stateful_approx_count_distinct(column: Column): Column = withAggregateFunction {
+//    StatefulHyperloglogPlus(column.expr)
+//  }
+//
+//  def stateful_approx_quantile(
+//      column: Column,
+//      relativeError: Double)
+//    : Column = withAggregateFunction {
+//
+//    StatefulApproxQuantile(
+//      column.expr,
+//      // val relativeError = 1.0D / accuracy inside StatefulApproxQuantile
+//      Literal(1.0 / relativeError),
+//      mutableAggBufferOffset = 0,
+//      inputAggBufferOffset = 0
+//    )
+//  }
 
-  def stateful_approx_quantile(
-      column: Column,
-      relativeError: Double)
-    : Column = withAggregateFunction {
+//  /** Data type detection with state */
+//  def stateful_datatype(column: Column): Column = {
+//    val statefulDataType = new StatefulDataType()
+//    statefulDataType(column)
+//  }
 
-    StatefulApproxQuantile(
-      column.expr,
-      // val relativeError = 1.0D / accuracy inside StatefulApproxQuantile
-      Literal(1.0 / relativeError),
-      mutableAggBufferOffset = 0,
-      inputAggBufferOffset = 0
-    )
-  }
-
-  /** Data type detection with state */
-  def stateful_datatype(column: Column): Column = {
-    val statefulDataType = new StatefulDataType()
-    statefulDataType(column)
-  }
-
-  def stateful_kll(
-      column: Column,
-      sketchSize: Int,
-      shrinkingFactor: Double): Column = {
-    val statefulKLL = new StatefulKLLSketch(sketchSize, shrinkingFactor)
-    statefulKLL(column)
-  }
+//  def stateful_kll(
+//      column: Column,
+//      sketchSize: Int,
+//      shrinkingFactor: Double): Column = {
+//    val statefulKLL = new StatefulKLLSketch(sketchSize, shrinkingFactor)
+//    statefulKLL(column)
+//  }
 }
 
 

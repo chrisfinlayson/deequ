@@ -18,10 +18,10 @@ package com.amazon.deequ.repository
 
 import com.amazon.deequ.analyzers.Analyzer
 import com.amazon.deequ.metrics.Metric
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 import com.amazon.deequ.analyzers.runners.AnalyzerContext
 import com.snowflake.snowpark.functions._
-import org.apache.spark.sql.Column
+//import org.apache.spark.sql.Column
 
 trait MetricsRepositoryMultipleResultsLoader {
 

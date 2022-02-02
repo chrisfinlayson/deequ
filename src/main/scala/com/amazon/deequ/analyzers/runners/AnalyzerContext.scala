@@ -19,7 +19,7 @@ package com.amazon.deequ.analyzers.runners
 import com.amazon.deequ.analyzers.{Analyzer, FilterableAnalyzer}
 import com.amazon.deequ.metrics.{DoubleMetric, Metric}
 import com.amazon.deequ.repository.SimpleResultSerde
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 
 /**
   * The result returned from AnalysisRunner and Analysis

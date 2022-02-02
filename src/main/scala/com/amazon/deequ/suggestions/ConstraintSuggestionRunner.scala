@@ -86,10 +86,10 @@ class ConstraintSuggestionRunner {
 
     val (trainingData, testData) = splitTrainTestSets(data, testsetRatio, testsetSplitRandomSeed)
 
-    if (cacheInputs) {
-      trainingData.cache()
-      testData.foreach { _.cache() }
-    }
+//    if (cacheInputs) {
+//      trainingData.cache()
+//      testData.foreach { _.cache() }
+//    }
 
     val (columnProfiles, constraintSuggestions) = ConstraintSuggestionRunner().profileAndSuggest(
       trainingData,

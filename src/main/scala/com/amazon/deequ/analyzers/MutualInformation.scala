@@ -74,7 +74,7 @@ case class MutualInformation(columns: Seq[String], where: Option[String] = None)
 
         val resultRow = value.head()
 
-        if (resultRow.isNullAt(0)) {
+        if (resultRow.is_nullAt(0)) {
           metricFromEmpty(this, "MutualInformation", columns.mkString(","), Entity.Mutlicolumn)
         } else {
           metricFromValue(resultRow.getDouble(0), "MutualInformation", columns.mkString(","),

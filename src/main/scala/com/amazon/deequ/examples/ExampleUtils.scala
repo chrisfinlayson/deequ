@@ -16,7 +16,7 @@
 
 package com.amazon.deequ.examples
 
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 
 private[deequ] object ExampleUtils {
 

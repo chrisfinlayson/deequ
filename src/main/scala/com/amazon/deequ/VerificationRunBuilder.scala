@@ -22,7 +22,7 @@ import com.amazon.deequ.analyzers.{State, _}
 import com.amazon.deequ.checks.{Check, CheckLevel}
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository._
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 
 /** A class to build a VerificationRun using a fluent API */
 class VerificationRunBuilder(val data: DataFrame) {

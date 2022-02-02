@@ -21,7 +21,8 @@ import com.amazon.deequ.analyzers.runners.AnalyzerContext
 import com.amazon.deequ.checks.{Check, CheckResult, CheckStatus}
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository.SimpleResultSerde
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.Session
+import com.snowflake.snowpark.DataFrame
 
 /**
   * The result returned from the VerificationSuite

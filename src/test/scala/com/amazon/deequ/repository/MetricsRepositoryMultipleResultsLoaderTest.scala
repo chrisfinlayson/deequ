@@ -25,7 +25,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import com.amazon.deequ.analyzers._
 import com.amazon.deequ.analyzers.runners.{AnalysisRunner, AnalyzerContext}
 import com.amazon.deequ.repository.memory.InMemoryMetricsRepository
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 
 class MetricsRepositoryMultipleResultsLoaderTest extends AnyWordSpec with Matchers
   with SparkContextSpec with FixtureSupport {

@@ -23,7 +23,7 @@ import com.amazon.deequ.analyzers.runners.{AnalysisRunner, AnalyzerContext}
 import com.amazon.deequ.metrics.{DoubleMetric, Entity, Metric}
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
 import com.amazon.deequ.utils.{FixtureSupport, TempFileUtils}
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 import AnalyzerContext._
 import com.amazon.deequ.SparkContextSpec
 import org.scalatest.wordspec.AnyWordSpec

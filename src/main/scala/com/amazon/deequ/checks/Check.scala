@@ -18,12 +18,13 @@ package com.amazon.deequ.checks
 
 import com.amazon.deequ.anomalydetection.{AnomalyDetectionStrategy, AnomalyDetector, DataPoint}
 import com.amazon.deequ.analyzers.runners.AnalyzerContext
-import com.amazon.deequ.analyzers.{Analyzer, Histogram, Patterns, State, KLLParameters}
+import com.amazon.deequ.analyzers.{Analyzer, Histogram, KLLParameters, Patterns, State}
 import com.amazon.deequ.constraints.Constraint._
 import com.amazon.deequ.constraints._
 import com.amazon.deequ.metrics.{BucketDistribution, Distribution, Metric}
 import com.amazon.deequ.repository.MetricsRepository
-import org.apache.spark.sql.expressions.UserDefinedFunction
+import com.snowflake.snowpark.UserDefinedFunction
+//import org.apache.spark.sql.expressions.UserDefinedFunction
 import com.amazon.deequ.anomalydetection.HistoryUtils
 import com.amazon.deequ.checks.ColumnCondition.{isEachNotNull, isAnyNotNull}
 
@@ -46,7 +47,7 @@ case class CheckResult(
 
 /**
   * A class representing a list of constraints that can be applied to a given
-  * [[org.apache.spark.sql.DataFrame]]. In order to run the checks, use the `run` method. You can
+  * DataFrame. In order to run the checks, use the `run` method. You can
   * also use VerificationSuite.run to run your checks along with other Checks and Analysis objects.
   * When run with VerificationSuite, Analyzers required by multiple checks/analysis blocks is
   * optimized to run once.

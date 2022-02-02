@@ -20,6 +20,7 @@ import com.amazon.deequ.analyzers.Analyzer
 import com.amazon.deequ.metrics.Metric
 import org.apache.spark.sql._
 import com.amazon.deequ.analyzers.runners.AnalyzerContext
+import com.snowflake.snowpark.{DataFrame, Session}
 import com.snowflake.snowpark.functions.lit
 
 case class AnalysisResult(
@@ -114,7 +115,7 @@ private[repository] object AnalysisResult {
     : String = {
 
     var tagColumnName = tagName.replaceAll("[^A-Za-z0-9_]", "").toLowerCase
-    if (dataFrame.columns.contains(tagColumnName)) {
+    if (dataFrame.schema.fields.contains(tagColumnName)) {
       tagColumnName = tagColumnName + "_2"
     }
     tagColumnName

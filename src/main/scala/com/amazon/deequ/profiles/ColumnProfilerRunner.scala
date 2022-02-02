@@ -53,9 +53,9 @@ class ColumnProfilerRunner {
       predefinedTypes: Map[String, DataTypeInstances.Value])
     : ColumnProfiles = {
 
-    if (cacheInputs) {
-      data.cache()
-    }
+//    if (cacheInputs) {
+//      data.cache()
+//    }
 
     val columnProfiles = ColumnProfiler
       .profile(
@@ -77,10 +77,10 @@ class ColumnProfilerRunner {
       printStatusUpdates,
       columnProfiles
     )
-
-    if (cacheInputs) {
-      data.unpersist()
-    }
+//
+//    if (cacheInputs) {
+//      data.unpersist()
+//    }
 
     columnProfiles
   }

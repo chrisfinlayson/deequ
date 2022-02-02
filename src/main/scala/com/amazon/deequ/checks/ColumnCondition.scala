@@ -22,14 +22,14 @@ private[checks] object ColumnCondition {
 
   def isEachNotNull(cols: Seq[String]): String = {
     cols
-      .map(col(_).isNotNull)
+      .map(col(_).is_not_null)
       .reduce(_ and _)
       .toString()
   }
 
   def isAnyNotNull(cols: Seq[String]): String = {
     cols
-      .map(col(_).isNotNull)
+      .map(col(_).is_not_null)
       .reduce(_ or _)
       .toString()
   }

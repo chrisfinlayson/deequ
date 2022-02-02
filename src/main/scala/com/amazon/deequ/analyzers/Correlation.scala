@@ -80,7 +80,7 @@ case class Correlation(
 
   override def fromAggregationResult(result: Row, offset: Int): Option[CorrelationState] = {
 
-    if (result.isNullAt(offset)) {
+    if (result.is_nullAt(offset)) {
       None
     } else {
       val row = result.getAs[Row](offset)

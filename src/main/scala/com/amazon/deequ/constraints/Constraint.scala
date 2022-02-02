@@ -18,7 +18,8 @@ package com.amazon.deequ.constraints
 
 import com.amazon.deequ.analyzers._
 import com.amazon.deequ.metrics.{BucketDistribution, Distribution, Metric}
-import org.apache.spark.sql.expressions.UserDefinedFunction
+import com.snowflake.snowpark.UserDefinedFunction
+//import org.apache.spark.sql.expressions.UserDefinedFunction
 
 import scala.util.matching.Regex
 

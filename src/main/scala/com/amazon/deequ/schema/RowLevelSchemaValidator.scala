@@ -16,7 +16,8 @@
 
 package com.amazon.deequ.schema
 
-import com.snowflake.snowpark.functions.{col, expr, length, not, unix_timestamp, regexp_extract}
+import com.snowflake.snowpark.Column.expr
+import com.snowflake.snowpark.functions.{col, length, not}
 import com.snowflake.snowpark.types.{DecimalType, IntegerType, TimestampType}
 import com.snowflake.snowpark.{Column, DataFrame}
 //import org.apache.spark.storage.StorageLevel
@@ -24,14 +25,14 @@ import com.snowflake.snowpark.{Column, DataFrame}
 
 sealed trait ColumnDefinition {
   def name: String
-  def isNullable: Boolean
+  def is_nullable: Boolean
 
   def castExpression(): Column = { col(name) }
 }
 
 private[this] case class StringColumnDefinition(
     name: String,
-    isNullable: Boolean = true,
+    is_nullable: Boolean = true,
     minLength: Option[Int] = None,
     maxLength: Option[Int] = None,
     matches: Option[String] = None)
@@ -39,7 +40,7 @@ private[this] case class StringColumnDefinition(
 
 private[this] case class IntColumnDefinition(
     name: String,
-    isNullable: Boolean = true,
+    is_nullable: Boolean = true,
     minValue: Option[Int] = None,
     maxValue: Option[Int] = None)
   extends ColumnDefinition {
@@ -51,7 +52,7 @@ private[this] case class DecimalColumnDefinition(
     name: String,
     precision: Int,
     scale: Int,
-    isNullable: Boolean = true)
+    is_nullable: Boolean = true)
   extends ColumnDefinition {
 
   override def castExpression(): Column = { col(name).cast(DecimalType(precision, scale)).as(name) }
@@ -60,7 +61,7 @@ private[this] case class DecimalColumnDefinition(
 private[this] case class TimestampColumnDefinition(
     name: String,
     mask: String,
-    isNullable: Boolean = true)
+    is_nullable: Boolean = true)
   extends ColumnDefinition {
 
   override def castExpression(): Column = {
@@ -76,7 +77,7 @@ case class RowLevelSchema(columnDefinitions: Seq[ColumnDefinition] = Seq.empty) 
     * Declare a textual column
     *
     * @param name column name
-    * @param isNullable are NULL values permitted?
+    * @param is_nullable are NULL values permitted?
     * @param minLength  minimum length of values
     * @param maxLength  maximum length of values
     * @param matches regular expression which the column value must match
@@ -84,13 +85,13 @@ case class RowLevelSchema(columnDefinitions: Seq[ColumnDefinition] = Seq.empty) 
     */
   def withStringColumn(
       name: String,
-      isNullable: Boolean = true,
+      is_nullable: Boolean = true,
       minLength: Option[Int] = None,
       maxLength: Option[Int] = None,
       matches: Option[String] = None)
     : RowLevelSchema = {
 
-    RowLevelSchema(columnDefinitions :+ StringColumnDefinition(name, isNullable, minLength,
+    RowLevelSchema(columnDefinitions :+ StringColumnDefinition(name, is_nullable, minLength,
       maxLength, matches))
   }
 
@@ -98,19 +99,19 @@ case class RowLevelSchema(columnDefinitions: Seq[ColumnDefinition] = Seq.empty) 
     * Declare an integer column
     *
     * @param name column name
-    * @param isNullable are NULL values permitted?
+    * @param is_nullable are NULL values permitted?
     * @param minValue minimum value
     * @param maxValue maximum value
     * @return
     */
   def withIntColumn(
       name: String,
-      isNullable: Boolean = true,
+      is_nullable: Boolean = true,
       minValue: Option[Int] = None,
       maxValue: Option[Int] = None)
     : RowLevelSchema = {
 
-    RowLevelSchema(columnDefinitions :+ IntColumnDefinition(name, isNullable, minValue, maxValue))
+    RowLevelSchema(columnDefinitions :+ IntColumnDefinition(name, is_nullable, minValue, maxValue))
   }
 
   /**
@@ -119,17 +120,17 @@ case class RowLevelSchema(columnDefinitions: Seq[ColumnDefinition] = Seq.empty) 
     * @param name column name
     * @param precision  precision of values
     * @param scale  scale of values
-    * @param isNullable are NULL values permitted?
+    * @param is_nullable are NULL values permitted?
     * @return
     */
   def withDecimalColumn(
       name: String,
       precision: Int,
       scale: Int,
-      isNullable: Boolean = true)
+      is_nullable: Boolean = true)
     : RowLevelSchema = {
 
-    RowLevelSchema(columnDefinitions :+ DecimalColumnDefinition(name, precision, scale, isNullable))
+    RowLevelSchema(columnDefinitions :+ DecimalColumnDefinition(name, precision, scale, is_nullable))
   }
 
   /**
@@ -137,16 +138,16 @@ case class RowLevelSchema(columnDefinitions: Seq[ColumnDefinition] = Seq.empty) 
     *
     * @param name column name
     * @param mask pattern for the timestamp
-    * @param isNullable are NULL values permitted?
+    * @param is_nullable are NULL values permitted?
     * @return
     */
   def withTimestampColumn(
       name: String,
       mask: String,
-      isNullable: Boolean = true)
+      is_nullable: Boolean = true)
     : RowLevelSchema = {
 
-    RowLevelSchema(columnDefinitions :+ TimestampColumnDefinition(name, mask, isNullable))
+    RowLevelSchema(columnDefinitions :+ TimestampColumnDefinition(name, mask, is_nullable))
   }
 }
 
@@ -182,14 +183,15 @@ object RowLevelSchemaValidator {
     */
   def validate(
       data: DataFrame,
-      schema: RowLevelSchema,
-      storageLevelForIntermediateResults: StorageLevel = StorageLevel.MEMORY_AND_DISK
+      schema: RowLevelSchema
+//      ,
+//      storageLevelForIntermediateResults: StorageLevel = StorageLevel.MEMORY_AND_DISK
     ): RowLevelSchemaValidationResult = {
 
     val dataWithMatches = data
       .withColumn(MATCHES_COLUMN, toCNF(schema))
 
-    dataWithMatches.persist(storageLevelForIntermediateResults)
+//    dataWithMatches.persist(storageLevelForIntermediateResults)
 
     val validRows = extractAndCastValidRows(dataWithMatches, schema)
     val numValidRows = validRows.count()
@@ -200,7 +202,7 @@ object RowLevelSchemaValidator {
 
     val numInValidRows = invalidRows.count()
 
-    dataWithMatches.unpersist(false)
+//    dataWithMatches.unpersist(false)
 
     RowLevelSchemaValidationResult(validRows, numValidRows, invalidRows, numInValidRows)
   }
@@ -227,11 +229,11 @@ object RowLevelSchemaValidator {
 
       var nextCnf = cnf
 
-      if (!columnDefinition.isNullable) {
-        nextCnf = nextCnf.and(col(columnDefinition.name).isNotNull)
+      if (!columnDefinition.is_nullable) {
+        nextCnf = nextCnf.and(col(columnDefinition.name).is_not_null)
       }
 
-      val colIsNull = col(columnDefinition.name).isNull
+      val colis_null = col(columnDefinition.name).is_null
 
       columnDefinition match {
 
@@ -240,40 +242,40 @@ object RowLevelSchemaValidator {
           val colAsInt = col(intDef.name).cast(IntegerType)
 
           /* null or successfully casted */
-          nextCnf = nextCnf.and(colIsNull.or(colAsInt.isNotNull))
+          nextCnf = nextCnf.and(colis_null.or(colAsInt.is_not_null))
 
           intDef.minValue.foreach { value =>
-            nextCnf = nextCnf.and(colIsNull.isNull.or(colAsInt.geq(value)))
+            nextCnf = nextCnf.and(colis_null.is_null.or(colAsInt.geq(value)))
           }
 
           intDef.maxValue.foreach { value =>
-            nextCnf = nextCnf.and(colIsNull.or(colAsInt.leq(value)))
+            nextCnf = nextCnf.and(colis_null.or(colAsInt.leq(value)))
           }
 
         case decDef: DecimalColumnDefinition =>
 
           val decType = DataTypes.createDecimalType(decDef.precision, decDef.scale)
-          nextCnf = nextCnf.and(colIsNull.or(col(decDef.name).cast(decType).isNotNull))
+          nextCnf = nextCnf.and(colis_null.or(col(decDef.name).cast(decType).is_not_null))
 
         case strDef: StringColumnDefinition =>
 
           strDef.minLength.foreach { value =>
-            nextCnf = nextCnf.and(colIsNull.or(length(col(strDef.name)).geq(value)))
+            nextCnf = nextCnf.and(colis_null.or(length(col(strDef.name)).geq(value)))
           }
 
           strDef.maxLength.foreach { value =>
-            nextCnf = nextCnf.and(colIsNull.or(length(col(strDef.name)).leq(value)))
+            nextCnf = nextCnf.and(colis_null.or(length(col(strDef.name)).leq(value)))
           }
 
           strDef.matches.foreach { regex =>
             nextCnf = nextCnf
-              .and(colIsNull.or(regexp_extract(col(strDef.name), regex, 0).notEqual("")))
+              .and(colis_null.or(regexp_extract(col(strDef.name), regex, 0).notEqual("")))
           }
 
         case tsDef: TimestampColumnDefinition =>
           /* null or successfully casted */
-          nextCnf = nextCnf.and(colIsNull.or(unix_timestamp(col(tsDef.name), tsDef.mask)
-            .cast(TimestampType).isNotNull))
+          nextCnf = nextCnf.and(colis_null.or(unix_timestamp(col(tsDef.name), tsDef.mask)
+            .cast(TimestampType).is_not_null))
       }
 
       nextCnf

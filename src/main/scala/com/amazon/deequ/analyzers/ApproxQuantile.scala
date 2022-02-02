@@ -20,9 +20,11 @@ import com.amazon.deequ.analyzers.Preconditions.{hasColumn, isNumeric}
 import com.amazon.deequ.analyzers.runners.{IllegalAnalyzerParameterException, MetricCalculationException}
 import com.amazon.deequ.analyzers.Analyzers.conditionalSelection
 import com.amazon.deequ.metrics.DoubleMetric
-import org.apache.spark.sql.{DeequFunctions, Row}
-import org.apache.spark.sql.catalyst.expressions.aggregate.ApproximatePercentile
-import org.apache.spark.sql.catalyst.expressions.aggregate.ApproximatePercentile.PercentileDigest
+import org.apache.spark.sql.DeequFunctions
+import com.snowflake.snowpark.Row
+
+//import org.apache.spark.sql.catalyst.expressions.aggregate.ApproximatePercentile
+//import org.apache.spark.sql.catalyst.expressions.aggregate.ApproximatePercentile.PercentileDigest
 import com.snowflake.snowpark.types.StructType
 
 case class ApproxQuantileState(percentileDigest: PercentileDigest)
@@ -75,7 +77,7 @@ case class ApproxQuantile(
       result: Row, offset: Int)
     : Option[ApproxQuantileState] = {
 
-    if (result.isNullAt(offset)) {
+    if (result.is_nullAt(offset)) {
       None
     } else {
       val digest = ApproximatePercentile.serializer.deserialize(result.getAs[Array[Byte]](offset))

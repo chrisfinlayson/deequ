@@ -61,7 +61,7 @@ case class ApproxQuantiles(column: String, quantiles: Seq[Double], relativeError
       offset: Int)
     : Option[ApproxQuantileState] = {
 
-    if (result.isNullAt(offset)) {
+    if (result.is_nullAt(offset)) {
       None
     } else {
 

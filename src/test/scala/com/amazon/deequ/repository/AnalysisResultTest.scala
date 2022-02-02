@@ -23,7 +23,7 @@ import com.amazon.deequ.utils.FixtureSupport
 import org.scalatest.matchers.should.Matchers
 import com.amazon.deequ.analyzers._
 import com.amazon.deequ.analyzers.runners.{AnalysisRunBuilder, AnalysisRunner, AnalyzerContext}
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 import org.scalatest.wordspec.AnyWordSpec
 
 class AnalysisResultTest extends AnyWordSpec

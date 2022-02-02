@@ -19,7 +19,7 @@ package com.amazon.deequ.analyzers.runners
 import com.amazon.deequ.analyzers.{Analyzer, KLLParameters, KLLSketch, KLLState, QuantileNonSample, State, StateLoader, StatePersister}
 import com.amazon.deequ.metrics.Metric
 import com.snowflake.snowpark.types.{ByteType, DoubleType, FloatType, IntegerType, LongType, ShortType, StructType}
-import org.apache.spark.sql.{DataFrame, Row}
+import com.snowflake.snowpark.{DataFrame, Row}
 
 @SerialVersionUID(1L)
 abstract class UntypedQuantileNonSample(sketchSize: Int, shrinkingFactor: Double)
@@ -86,40 +86,40 @@ class FloatQuantileNonSample(sketchSize: Int, shrinkingFactor: Double)
 
 object KLLRunner {
 
-  def computeKLLSketchesInExtraPass(
-      data: DataFrame,
-      analyzers: Seq[Analyzer[State[_], Metric[_]]],
-      aggregateWith: Option[StateLoader] = None,
-      saveStatesTo: Option[StatePersister] = None)
-    : AnalyzerContext = {
-
-    val kllAnalyzers = analyzers.map { _.asInstanceOf[KLLSketch] }
-
-    val columnsAndParameters = kllAnalyzers
-      .map { analyzer => (analyzer.column, analyzer.kllParameters) }
-        .toMap
-
-    val sketching = sketchPartitions(columnsAndParameters, data.schema)_
-
-    val sketchPerColumn =
-      data.rdd
-        .mapPartitions(sketching, preservesPartitioning = true)
-        .treeReduce { case (columnAndSketchesA, columnAndSketchesB) =>
-            columnAndSketchesA.map { case (column, sketch) =>
-              sketch.mergeUntyped(columnAndSketchesB(column))
-              column -> sketch
-            }
-        }
-
-    val metricsByAnalyzer = kllAnalyzers.map { analyzer =>
-      val kllState = sketchPerColumn(analyzer.column).asKLLState()
-      val metric = analyzer.calculateMetric(Some(kllState), aggregateWith, saveStatesTo)
-
-      analyzer -> metric
-    }
-
-    AnalyzerContext(metricsByAnalyzer.toMap[Analyzer[_, Metric[_]], Metric[_]])
-  }
+//  def computeKLLSketchesInExtraPass(
+//      data: DataFrame,
+//      analyzers: Seq[Analyzer[State[_], Metric[_]]],
+//      aggregateWith: Option[StateLoader] = None,
+//      saveStatesTo: Option[StatePersister] = None)
+//    : AnalyzerContext = {
+//
+//    val kllAnalyzers = analyzers.map { _.asInstanceOf[KLLSketch] }
+//
+//    val columnsAndParameters = kllAnalyzers
+//      .map { analyzer => (analyzer.column, analyzer.kllParameters) }
+//        .toMap
+//
+//    val sketching = sketchPartitions(columnsAndParameters, data.schema)_
+//
+//    val sketchPerColumn =
+//      data.rdd
+//        .mapPartitions(sketching, preservesPartitioning = true)
+//        .treeReduce { case (columnAndSketchesA, columnAndSketchesB) =>
+//            columnAndSketchesA.map { case (column, sketch) =>
+//              sketch.mergeUntyped(columnAndSketchesB(column))
+//              column -> sketch
+//            }
+//        }
+//
+//    val metricsByAnalyzer = kllAnalyzers.map { analyzer =>
+//      val kllState = sketchPerColumn(analyzer.column).asKLLState()
+//      val metric = analyzer.calculateMetric(Some(kllState), aggregateWith, saveStatesTo)
+//
+//      analyzer -> metric
+//    }
+//
+//    AnalyzerContext(metricsByAnalyzer.toMap[Analyzer[_, Metric[_]], Metric[_]])
+//  }
 
   private[this] def emptySketches(
       columnsAndParameters: Map[String, Option[KLLParameters]],
@@ -167,7 +167,7 @@ object KLLRunner {
     while (rows.hasNext) {
       val row = rows.next()
       indexesAndSketches.foreach { case (index, sketch) =>
-        if (!row.isNullAt(index)) {
+        if (!row.is_nullAt(index)) {
           sketch.updateUntyped(row.get(index))
         }
       }

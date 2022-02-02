@@ -276,6 +276,6 @@ private[deequ] class Applicability(session: Session) {
       Row(cells: _*)
     }
 
-    session.createDataFrame(session.sparkContext.parallelize(rows), schema)
+    session.createDataFrame(rows, schema)
   }
 }

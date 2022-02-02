@@ -24,7 +24,7 @@ import com.amazon.deequ.io.DfsUtils
 import com.amazon.deequ.metrics.Metric
 import com.amazon.deequ.repository.{MetricsRepository, ResultKey}
 import com.snowflake.snowpark.types.StructType
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 
 private[deequ] case class VerificationMetricsRepositoryOptions(
       metricsRepository: Option[MetricsRepository] = None,

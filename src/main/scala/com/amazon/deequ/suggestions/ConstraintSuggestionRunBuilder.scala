@@ -20,7 +20,7 @@ import com.amazon.deequ.analyzers.{DataTypeInstances, KLLParameters}
 import com.amazon.deequ.profiles.{ColumnProfile, ColumnProfiler}
 import com.amazon.deequ.repository._
 import com.amazon.deequ.suggestions.rules.ConstraintRule
-import com.snowflake.snowpark.{Dataframe, Session}
+import com.snowflake.snowpark.{DataFrame, Session}
 
 /** A class to build a Constraint Suggestion run using a fluent API */
 class ConstraintSuggestionRunBuilder(val data: DataFrame) {
